@@ -74,7 +74,7 @@
                                     alt="Profile"
                                     class="mx-auto rounded-full border border-gray-300 w-12 h-12 object-cover">
                             </td>
-                            <td class="text-gray-800 font-semibold">{{ $employee->full_name }}</td>
+                            <td class="text-gray-800 font-semibold">{{ $employee->user->name ?? 'N/A' }}</td>
                             <td class="text-gray-600">{{ $employee->position }}</td>
 
                             <td>
@@ -82,7 +82,10 @@
                                     @if (Auth::user()->role === 'admin')
                                         <div class="flex justify-center gap-2">
                                             <button class="btn btn-warning btn-sm"
-                                                onclick="openUpdateModal({{ $employee->id }}, '{{ $employee->full_name }}', '{{ $employee->position }}', '{{ $employee->user->email }}')">
+                                                onclick="updateModal.showModal({{ $employee->id }},
+                                                                    '{{ $employee->user->name }}',
+                                                                    '{{ $employee->position }}',
+                                                                    '{{ $employee->user->email }}')">
                                                 <i class="fas fa-user-edit"></i> Edit
                                             </button>
 
@@ -110,6 +113,9 @@
                                 @endauth
                             </td>
                         </tr>
+
+                        @include('partials.passwordModal')
+                        @include('partials.updateEmpModal')
                     @empty
                         <tr>
                             <td colspan="5" class="text-gray-400 py-4 font-medium">No employees found</td>
@@ -127,9 +133,7 @@
         </div>
     </div>
 
-    @include('partials.passwordModal')
     @include('partials.adminModal')
-    @include('partials.updateEmpModal')
     @include('partials.addEmpModal')
     @include('partials.viewAttendanceSummary')
 @endsection

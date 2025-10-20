@@ -58,11 +58,13 @@
                         <th>Profile</th>
                         <th>Full Name</th>
                         <th>Position</th>
-                        @if (Auth::user()->role === 'admin')
-                            <th>Actions</th>
+                        @auth
+                            @if (Auth::user()->role === 'admin')
+                                <th>Actions</th>
+                            @endif
                         @else
                             <th>Actions</th>
-                        @endif
+                        @endauth
                     </tr>
                 </thead>
                 <tbody>
@@ -99,24 +101,20 @@
                                                 </button>
                                             </form>
                                         </div>
-                                    @else
-                                        <div class="flex justify-center gap-2">
-                                            <button class="btn btn-success btn-sm hover:bg-green-600"
-                                                onclick="passwordDialog.showModal()">
-                                                <i class="fas fa-sign-in-alt"></i> Time In
-                                            </button>
-                                            <button class="btn btn-error btn-sm hover:bg-red-600"
-                                                onclick="passwordDialog.showModal()">
-                                                <i class="fas fa-sign-out-alt"></i> Time Out
-                                            </button>
-                                        </div>
                                     @endif
+                                @else
+                                    <button class="btn btn-primary" onclick="passwordDialog.showModal()">
+                                        <i class="fas fa-sign-in-alt"></i> Time In
+                                    </button>
+
+                                    <button class="btn btn-error btn-sm hover:bg-red-600"
+                                        onclick="openAttendanceModal('{{ $employee->user->email }}', '{{ $employee->user->name }}', '{{ asset('storage/' . $employee->emp_pic) }}', 'time-out')">
+                                        <i class="fas fa-sign-out-alt"></i> Time Out
+                                    </button>
+
                                 @endauth
                             </td>
                         </tr>
-
-                        @include('partials.passwordModal')
-                        @include('partials.updateEmpModal')
                     @empty
                         <tr>
                             <td colspan="5" class="text-gray-400 py-4 font-medium">No employees found</td>
@@ -134,22 +132,24 @@
         </div>
     </div>
 
+
+    @include('partials.passwordModal')
+    @include('partials.updateEmpModal')
+
     @include('partials.adminModal')
     @include('partials.addEmpModal')
     @include('partials.viewAttendanceSummary')
-    @include('partials.updateEmpModal')
 
     <script>
-function openUpdateModal(id, userId, name, position, email, picUrl) {
-    document.getElementById('update_id').value = id;
-    document.getElementById('update_user_id').value = userId ?? '';
-    document.getElementById('update_name').value = name ?? '';
-    document.getElementById('update_position').value = position ?? '';
-    document.getElementById('update_email').value = email ?? '';
-    var preview = document.getElementById('update_emp_pic_preview');
-    if (preview && picUrl) preview.src = picUrl;
-    document.getElementById('updateModal').showModal();
-}
-</script>
-
+        function openUpdateModal(id, userId, name, position, email, picUrl) {
+            document.getElementById('update_id').value = id;
+            document.getElementById('update_user_id').value = userId ?? '';
+            document.getElementById('update_name').value = name ?? '';
+            document.getElementById('update_position').value = position ?? '';
+            document.getElementById('update_email').value = email ?? '';
+            var preview = document.getElementById('update_emp_pic_preview');
+            if (preview && picUrl) preview.src = picUrl;
+            document.getElementById('updateModal').showModal();
+        }
+    </script>
 @endsection

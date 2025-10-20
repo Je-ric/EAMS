@@ -103,15 +103,20 @@
                                         </div>
                                     @endif
                                 @else
-                                    <button class="btn btn-primary" onclick="openAttendanceModal('{{ $employee->user->email }}', '{{ $employee->user->name }}', '{{ $employee->emp_pic ? asset('storage/' . $employee->emp_pic) : asset('pics/default.png') }}', 'time-in')">
-                                        <i class="fas fa-sign-in-alt"></i> Time In
+                                    <button
+                                        class="btn btn-primary flex items-center gap-2 px-4 py-2 rounded-lg shadow hover:scale-105 transition-transform"
+                                        onclick="openAttendanceModal('{{ $employee->user->email }}', '{{ $employee->user->name }}', '{{ $employee->emp_pic ? asset('storage/' . $employee->emp_pic) : asset('pics/default.png') }}', 'time-in')">
+                                        <i class="fas fa-sign-in-alt"></i>
+                                        <span>Time In</span>
                                     </button>
 
-                                    <button class="btn btn-error btn-sm hover:bg-red-600"
+                                    <!-- Time Out Button -->
+                                    <button
+                                        class="btn btn-error flex items-center gap-2 px-4 py-2 rounded-lg shadow hover:scale-105 transition-transform"
                                         onclick="openAttendanceModal('{{ $employee->user->email }}', '{{ $employee->user->name }}', '{{ asset('storage/' . $employee->emp_pic) }}', 'time-out')">
-                                        <i class="fas fa-sign-out-alt"></i> Time Out
+                                        <i class="fas fa-sign-out-alt"></i>
+                                        <span>Time Out</span>
                                     </button>
-
                                 @endauth
                             </td>
                         </tr>

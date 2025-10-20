@@ -34,9 +34,9 @@
                     <input type="file" id="update_emp_pic" name="emp_pic" accept="image/*" class="file-input file-input-bordered w-full" />
                 </div>
 
-                <!-- Full Name -->
+                <!-- Full Name (name changed to match controller) -->
                 <div>
-                    <input type="text" name="full_name" id="update_full_name" placeholder="Full Name" required
+                    <input type="text" name="name" id="update_name" placeholder="Full Name" required
                         class="input input-bordered w-full" />
                 </div>
 

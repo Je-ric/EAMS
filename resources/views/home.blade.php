@@ -82,10 +82,11 @@
                                     @if (Auth::user()->role === 'admin')
                                         <div class="flex justify-center gap-2">
                                             <button class="btn btn-warning btn-sm"
-                                                onclick="updateModal.showModal({{ $employee->id }},
-                                                                    '{{ $employee->user->name }}',
-                                                                    '{{ $employee->position }}',
-                                                                    '{{ $employee->user->email }}')">
+                                                onclick="openUpdateModal({{ $employee->id }}, {{ $employee->user->id ?? 'null' }},
+                                                                    '{{ addslashes($employee->user->name ?? '') }}',
+                                                                    '{{ addslashes($employee->position) }}',
+                                                                    '{{ addslashes($employee->user->email ?? '') }}',
+                                                                    '{{ addslashes($employee->emp_pic ? asset('storage/' . $employee->emp_pic) : asset('pics/default.png')) }}')">
                                                 <i class="fas fa-user-edit"></i> Edit
                                             </button>
 
@@ -136,4 +137,19 @@
     @include('partials.adminModal')
     @include('partials.addEmpModal')
     @include('partials.viewAttendanceSummary')
+    @include('partials.updateEmpModal')
+
+    <script>
+function openUpdateModal(id, userId, name, position, email, picUrl) {
+    document.getElementById('update_id').value = id;
+    document.getElementById('update_user_id').value = userId ?? '';
+    document.getElementById('update_name').value = name ?? '';
+    document.getElementById('update_position').value = position ?? '';
+    document.getElementById('update_email').value = email ?? '';
+    var preview = document.getElementById('update_emp_pic_preview');
+    if (preview && picUrl) preview.src = picUrl;
+    document.getElementById('updateModal').showModal();
+}
+</script>
+
 @endsection

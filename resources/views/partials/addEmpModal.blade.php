@@ -21,9 +21,9 @@
                 <input type="file" id="emp_pic" name="emp_pic" accept="image/*" class="file-input file-input-bordered w-full" />
             </div>
 
-            <!-- Full Name -->
+            <!-- Full Name (changed name attribute to match controller) -->
             <div>
-                <input type="text" name="full_name" placeholder="Full Name" required
+                <input type="text" name="name" placeholder="Full Name" required
                     class="input input-bordered w-full" />
             </div>
 
@@ -33,9 +33,9 @@
                     class="input input-bordered w-full" />
             </div>
 
-            <!-- Password -->
+            <!-- Password (make required to satisfy controller validation) -->
             <div>
-                <input type="password" name="password" placeholder="Password"
+                <input type="password" name="password" placeholder="Password" required
                     class="input input-bordered w-full" />
             </div>
 

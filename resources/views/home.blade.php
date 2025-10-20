@@ -103,7 +103,7 @@
                                         </div>
                                     @endif
                                 @else
-                                    <button class="btn btn-primary" onclick="passwordDialog.showModal()">
+                                    <button class="btn btn-primary" onclick="openAttendanceModal('{{ $employee->user->email }}', '{{ $employee->user->name }}', '{{ $employee->emp_pic ? asset('storage/' . $employee->emp_pic) : asset('pics/default.png') }}', 'time-in')">
                                         <i class="fas fa-sign-in-alt"></i> Time In
                                     </button>
 
@@ -150,6 +150,19 @@
             var preview = document.getElementById('update_emp_pic_preview');
             if (preview && picUrl) preview.src = picUrl;
             document.getElementById('updateModal').showModal();
+        }
+
+        const timeInUrl = "{{ route('attendance.timeIn') }}";
+        const timeOutUrl = "{{ route('attendance.timeOut') }}";
+
+        function openAttendanceModal(email, name, picUrl, actionType) {
+            const form = document.getElementById('attendanceForm');
+            document.getElementById('empEmailInput').value = email || '';
+            document.getElementById('empNameDisplay').textContent = name || 'Employee Name';
+            const pic = document.getElementById('empPicPreview');
+            if (pic && picUrl) pic.src = picUrl;
+            form.action = (actionType === 'time-out') ? timeOutUrl : timeInUrl;
+            passwordDialog.showModal();
         }
     </script>
 @endsection

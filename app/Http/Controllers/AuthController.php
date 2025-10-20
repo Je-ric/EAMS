@@ -29,21 +29,20 @@ class AuthController extends Controller
                 return back()->withErrors(['email' => 'Access denied. Admins only.']);
             }
 
-            return redirect()->route('admin');
+            return redirect()->route('admin.home');
         }
 
         return back()->withErrors(['email' => 'Invalid email or password.']);
     }
 
-    /**
-     * Logout admin
-     */
+
     public function logout(Request $request)
     {
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('admin.login');
+        return redirect()->route('index');
     }
+
 }

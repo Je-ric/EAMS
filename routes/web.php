@@ -12,7 +12,7 @@ Route::post('/admin/logout', [AuthController::class, 'logout'])->name('admin.log
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/admin', function () {
-        return view('admin');
+        return view('home');
     })->name('admin.home');
 });
 

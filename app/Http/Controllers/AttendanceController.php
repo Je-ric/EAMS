@@ -30,7 +30,7 @@ class AttendanceController extends Controller
             return back()->with('error', 'Employee not found.');
         }
 
-        $today = Carbon::today();
+        $today = now()->toDateString();
 
         $attendance = Attendance::firstOrNew([
             'emp_id' => $employee->id,
@@ -41,11 +41,12 @@ class AttendanceController extends Controller
             return back()->with('error', 'You already timed in today.');
         }
 
-        $attendance->time_in = now();
+        $attendance->time_in = now()->format('H:i:s'); // <-- important fix
         $attendance->save();
 
         return back()->with('success', 'Time-in recorded successfully.');
     }
+
 
     public function timeOut(Request $request)
     {
@@ -65,21 +66,21 @@ class AttendanceController extends Controller
             return back()->with('error', 'Employee not found.');
         }
 
-        $attendance = Attendance::where('emp_id', $employee->id)
-            ->whereDate('date', Carbon::today())
-            ->first();
+        $today = now()->toDateString();
 
-        if (!$attendance || !$attendance->time_in) {
-            return back()->with('error', 'You must time in before timing out.');
+        $attendance = Attendance::firstOrNew([
+            'emp_id' => $employee->id,
+            'date' => $today,
+        ]);
+
+        if ($attendance->time_in) {
+            return back()->with('error', 'You already timed in today.');
         }
 
-        if ($attendance->time_out) {
-            return back()->with('error', 'You already timed out today.');
-        }
+        $attendance->time_out = now()->format('H:i:s');
 
-        $attendance->time_out = now();
         $attendance->save();
 
-        return back()->with('success', 'Time-out recorded successfully.');
+        return back()->with('success', 'Time-in recorded successfully.');
     }
 }

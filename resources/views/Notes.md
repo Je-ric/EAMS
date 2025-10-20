@@ -5,3 +5,4 @@ php artisan make:migration create_attendance_table --create=tbl_attendance
 npm install -D tailwindcss@3 postcss autoprefixer
 npx tailwindcss init -p
 php artisan make:controller AuthController
+php artisan make:controller EmployeeController

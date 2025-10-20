@@ -66,36 +66,57 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr class="hover:bg-blue-50 transition-colors">
-                        <td class="font-medium text-gray-700">1</td>
-                        <td><img src="https://via.placeholder.com/80x50" alt="Profile"
-                                class="mx-auto rounded-full border border-gray-300"></td>
-                        <td class="text-gray-800 font-semibold">John Doe</td>
-                        <td class="text-gray-600">Manager</td>
-                        @if (Auth::user()->role === 'admin')
-                            <td class="text-gray-600">
-                                <button class="btn btn-warning gap-2" onclick="updateModal.showModal()">
-                                    <i class="fas fa-user-edit"></i> Edit
-                                </button>
+                    @forelse ($employees as $index => $employee)
+                        <tr class="hover:bg-blue-50 transition-colors">
+                            <td class="font-medium text-gray-700">{{ $index + 1 }}</td>
+                            <td>
+                                <img src="{{ $employee->emp_pic ? asset('storage/' . $employee->emp_pic) : 'https://via.placeholder.com/80x50' }}"
+                                    alt="Profile"
+                                    class="mx-auto rounded-full border border-gray-300 w-12 h-12 object-cover">
+                            </td>
+                            <td class="text-gray-800 font-semibold">{{ $employee->full_name }}</td>
+                            <td class="text-gray-600">{{ $employee->position }}</td>
 
-                                <button class="btn btn-error btn-sm hover:bg-red-600">Delete</button>
+                            <td>
+                                @auth
+                                    @if (Auth::user()->role === 'admin')
+                                        <div class="flex justify-center gap-2">
+                                            <button class="btn btn-warning btn-sm"
+                                                onclick="openUpdateModal({{ $employee->id }}, '{{ $employee->full_name }}', '{{ $employee->position }}', '{{ $employee->user->email }}')">
+                                                <i class="fas fa-user-edit"></i> Edit
+                                            </button>
+
+                                            <form method="POST" action="{{ route('employees.destroy', $employee->id) }}"
+                                                onsubmit="return confirm('Are you sure?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-error btn-sm hover:bg-red-600">
+                                                    <i class="fas fa-trash"></i> Delete
+                                                </button>
+                                            </form>
+                                        </div>
+                                    @else
+                                        <div class="flex justify-center gap-2">
+                                            <button class="btn btn-success btn-sm hover:bg-green-600"
+                                                onclick="passwordDialog.showModal()">
+                                                <i class="fas fa-sign-in-alt"></i> Time In
+                                            </button>
+                                            <button class="btn btn-error btn-sm hover:bg-red-600"
+                                                onclick="passwordDialog.showModal()">
+                                                <i class="fas fa-sign-out-alt"></i> Time Out
+                                            </button>
+                                        </div>
+                                    @endif
+                                @endauth
                             </td>
-                        @else
-                            <td class="flex justify-center gap-2">
-                                <button class="btn btn-success btn-sm hover:bg-green-600"
-                                    onclick="passwordDialog.showModal()">
-                                    <i class="fas fa-sign-in-alt"></i> Time In
-                                </button>
-                                <button class="btn btn-error btn-sm hover:bg-red-600" onclick="passwordDialog.showModal()">
-                                    <i class="fas fa-sign-out-alt"></i> Time Out
-                                </button>
-                            </td>
-                        @endif
-                    </tr>
-                    <tr>
-                        <td colspan="5" class="text-gray-400 py-4 font-medium">No more records</td>
-                    </tr>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="5" class="text-gray-400 py-4 font-medium">No employees found</td>
+                        </tr>
+                    @endforelse
                 </tbody>
+
             </table>
         </div>
 

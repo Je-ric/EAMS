@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\EmployeeController;
 
 Route::get('/', function () {
     return view('index');
@@ -16,3 +17,9 @@ Route::middleware(['auth'])->group(function () {
         return view('admin');
     })->name('admin.home');
 });
+
+
+Route::get('/employees', [EmployeeController::class, 'index'])->name('employees.index');
+Route::post('/employees', [EmployeeController::class, 'store'])->name('employees.store');
+Route::put('/employees/update', [EmployeeController::class, 'update'])->name('employees.update');
+Route::delete('/employees/{id}', [EmployeeController::class, 'destroy'])->name('employees.destroy');

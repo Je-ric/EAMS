@@ -125,16 +125,22 @@
                                 @else
                                     <div class="flex justify-center gap-2 flex-wrap">
                                         <button
-                                            class="flex items-center gap-1 px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-                                            onclick="openAttendanceModal('{{ $employee->user->email }}', '{{ $employee->user->name }}', '{{ $employee->emp_pic ? asset('storage/' . $employee->emp_pic) : asset('pics/default.png') }}', 'time-in')">
+                                            class="flex items-center gap-1 px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
+                                            data-email="{{ $employee->user->email }}"
+                                            onclick="openAttendanceModal('{{ $employee->user->email }}', '{{ $employee->user->name }}', '{{ $employee->emp_pic ? asset('storage/' . $employee->emp_pic) : asset('pics/default.png') }}', 'time-in')"
+                                            @if (!$employee->timeInDone || $employee->bothDone) disabled @endif>
                                             <i class='bx bx-log-in'></i> Time In
                                         </button>
+
                                         <button
-                                            class="flex items-center gap-1 px-3 py-1.5 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
-                                            onclick="openAttendanceModal('{{ $employee->user->email }}', '{{ $employee->user->name }}', '{{ asset('storage/' . $employee->emp_pic) }}', 'time-out')">
+                                            class="flex items-center gap-1 px-3 py-1.5 bg-red-500 text-white rounded-lg hover:bg-red-600 transition disabled:opacity-50"
+                                            data-email="{{ $employee->user->email }}"
+                                            onclick="openAttendanceModal('{{ $employee->user->email }}', '{{ $employee->user->name }}', '{{ $employee->emp_pic ? asset('storage/' . $employee->emp_pic) : asset('pics/default.png') }}', 'time-out')"
+                                            @if ($employee->timeInDone || $employee->timeOutDone || $employee->bothDone) disabled @endif>
                                             <i class='bx bx-log-out'></i> Time Out
                                         </button>
                                     </div>
+
                                 @endauth
                             </td>
                         </tr>

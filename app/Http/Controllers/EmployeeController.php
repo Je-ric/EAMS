@@ -12,18 +12,25 @@ use Carbon\Carbon;
 
 class EmployeeController extends Controller
 {
-    /**
-     * Display all employees with user data.
-     */
     public function index()
     {
-        $employees = Employee::with('user')->get();
+        $employees = Employee::with(['user', 'attendances'])->get();
+        $today = Carbon::today()->toDateString();
+
+        // Map each employee to include timeInDone and timeOutDone flags
+        $employees = $employees->map(function ($employee) use ($today) {
+            $todayAttendance = $employee->attendances->firstWhere('date', $today);
+            $timeInDone = $todayAttendance && $todayAttendance->time_in ? true : false;
+            $timeOutDone = $todayAttendance && $todayAttendance->time_out ? true : false;
+            $bothDone = $timeInDone && $timeOutDone;
+            $employee->timeInDone = $timeInDone;
+            $employee->timeOutDone = $timeOutDone;
+            $employee->bothDone = $bothDone;
+            return $employee;
+        });
         return view('home', compact('employees'));
     }
 
-    /**
-     * Store a newly created employee in storage.
-     */
     public function store(Request $request)
     {
         $request->validate([

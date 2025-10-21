@@ -45,6 +45,9 @@ class AttendanceController extends Controller
         $attendance->time_in = now()->format('H:i:s');
         $attendance->save();
 
+        if ($request->ajax()) {
+            return response()->json(['success' => 'Time-in recorded successfully!']);
+        }
         return back()->with('success', 'Time-in recorded successfully.');
     }
 
@@ -87,6 +90,9 @@ class AttendanceController extends Controller
         $attendance->time_out = now()->format('H:i:s');
         $attendance->save();
 
+        if ($request->ajax()) {
+            return response()->json(['success' => 'Time-out recorded successfully!']);
+        }
         return back()->with('success', 'Time-out recorded successfully.');
     }
 

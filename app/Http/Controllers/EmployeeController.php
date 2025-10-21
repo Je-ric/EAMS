@@ -15,19 +15,15 @@ class EmployeeController extends Controller
     public function index()
     {
         $employees = Employee::with(['user', 'attendances'])->get();
-        $today = Carbon::today()->toDateString();
+        $today = now()->toDateString();
 
-        // Map each employee to include timeInDone and timeOutDone flags
         $employees = $employees->map(function ($employee) use ($today) {
             $todayAttendance = $employee->attendances->firstWhere('date', $today);
-            $timeInDone = $todayAttendance && $todayAttendance->time_in ? true : false;
-            $timeOutDone = $todayAttendance && $todayAttendance->time_out ? true : false;
-            $bothDone = $timeInDone && $timeOutDone;
-            $employee->timeInDone = $timeInDone;
-            $employee->timeOutDone = $timeOutDone;
-            $employee->bothDone = $bothDone;
+            $employee->timeInDone = $todayAttendance && $todayAttendance->time_in ? true : false;
+            $employee->timeOutDone = $todayAttendance && $todayAttendance->time_out ? true : false;
             return $employee;
         });
+
         return view('home', compact('employees'));
     }
 

@@ -84,20 +84,21 @@
                             <td class="px-4 py-2 text-gray-600">{{ $employee->position }}</td>
                             <td class="px-4 py-2 text-gray-700">
                                 @php
-                                    $last = $employee->attendances->first();
+                                    $today = \Carbon\Carbon::today()->toDateString();
+                                    $todayAttendance = $employee->attendances->firstWhere('date', $today);
                                 @endphp
 
-                                @if ($last)
-                                    {{ \Carbon\Carbon::parse($last->time_in, 'Asia/Manila')->format('h:i A') ?? '-' }} -
-                                    @if ($last->time_out)
-                                        {{ \Carbon\Carbon::parse($last->time_out, 'Asia/Manila')->format('h:i A') }}
-                                    @else
-                                        <span class="text-yellow-500 font-semibold">Active</span>
+                                @if ($todayAttendance)
+                                    {{ $todayAttendance->time_in ? \Carbon\Carbon::parse($todayAttendance->time_in, 'Asia/Manila')->format('h:i A') : '' }}
+                                    @if ($todayAttendance->time_out)
+                                        -
+                                        {{ \Carbon\Carbon::parse($todayAttendance->time_out, 'Asia/Manila')->format('h:i A') }}
                                     @endif
                                 @else
                                     <span class="text-red-500 font-semibold">No record</span>
                                 @endif
                             </td>
+
                             <td class="px-4 py-2">
                                 @auth
                                     @if (Auth::user()->role === 'admin')
@@ -128,7 +129,7 @@
                                             class="flex items-center gap-1 px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
                                             data-email="{{ $employee->user->email }}"
                                             onclick="openAttendanceModal('{{ $employee->user->email }}', '{{ $employee->user->name }}', '{{ $employee->emp_pic ? asset('storage/' . $employee->emp_pic) : asset('pics/default.png') }}', 'time-in')"
-                                            @if (!$employee->timeInDone || $employee->bothDone) disabled @endif>
+                                            @if ($employee->timeInDone || ($employee->timeInDone && $employee->timeOutDone)) disabled @endif>
                                             <i class='bx bx-log-in'></i> Time In
                                         </button>
 
@@ -136,11 +137,10 @@
                                             class="flex items-center gap-1 px-3 py-1.5 bg-red-500 text-white rounded-lg hover:bg-red-600 transition disabled:opacity-50"
                                             data-email="{{ $employee->user->email }}"
                                             onclick="openAttendanceModal('{{ $employee->user->email }}', '{{ $employee->user->name }}', '{{ $employee->emp_pic ? asset('storage/' . $employee->emp_pic) : asset('pics/default.png') }}', 'time-out')"
-                                            @if ($employee->timeInDone || $employee->timeOutDone || $employee->bothDone) disabled @endif>
+                                            @if (!$employee->timeInDone || $employee->timeOutDone) disabled @endif>
                                             <i class='bx bx-log-out'></i> Time Out
                                         </button>
                                     </div>
-
                                 @endauth
                             </td>
                         </tr>

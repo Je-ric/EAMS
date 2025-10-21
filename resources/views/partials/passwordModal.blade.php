@@ -27,7 +27,6 @@
     </form>
 </dialog>
 
-
 <script>
     $(document).ready(function() {
         $('#attendanceForm').on('submit', function(e) {
@@ -36,21 +35,21 @@
             const form = $(this);
             const url = form.attr('action');
             const email = $('#empEmailInput').val();
-            const password = form.find('input[name="password"]').val();
+            const passwordInput = form.find('input[name="password"]');
 
             $.ajax({
                 url: url,
                 method: 'POST',
                 data: {
                     email: email,
-                    password: password,
+                    password: passwordInput.val(),
                     _token: '{{ csrf_token() }}'
                 },
                 success: function(res) {
                     if (res.success || res.message) {
-                        alert(res.success || res.message ||
-                            'Attendance recorded successfully!');
+                        alert(res.success || res.message || 'Attendance recorded successfully!');
                         $('#passwordDialog')[0].close();
+                        passwordInput.val('');
 
                         // Find the employee row by email
                         const row = $('button[data-email="' + email + '"]').closest('tr');
@@ -61,18 +60,24 @@
                             hour12: true
                         });
 
-                        let cell = row.find('td').eq(4); // 5th col (Attendance)
-                        let html = cell.html();
+                        let cell = row.find('td').eq(4); // Attendance column
+                        let html = cell.html().trim();
 
+                        // Attendance cell update
                         if (url.includes('time-in')) {
-                            cell.html(
-                                `<span class="text-green-700 font-semibold">${formatted}</span> - <span class="text-yellow-500 font-semibold">Active</span>`
-                                );
+                            // Only time in exists, leave time out blank
+                            cell.html(`${formatted}`);
+                            // Disable Time In, enable Time Out
+                            row.find('button:contains("Time In")').prop('disabled', true);
+                            row.find('button:contains("Time Out")').prop('disabled', false);
                         } else {
+                            // Time out recorded
                             let timeIn = html.split('-')[0].trim();
-                            cell.html(
-                                `${timeIn} - <span class="text-red-700 font-semibold">${formatted}</span>`
-                                );
+                            if (!timeIn) timeIn = formatted; // fallback if cell was empty
+                            cell.html(timeIn ? `${timeIn} - ${formatted}` : `${formatted}`);
+                            // Disable both buttons after time out
+                            row.find('button:contains("Time In")').prop('disabled', true);
+                            row.find('button:contains("Time Out")').prop('disabled', true);
                         }
                     } else {
                         alert('Attendance recorded successfully!');
@@ -80,6 +85,7 @@
                 },
                 error: function(xhr) {
                     alert(xhr.responseJSON?.error || 'Failed to record attendance.');
+                    passwordInput.val('');
                 }
             });
         });

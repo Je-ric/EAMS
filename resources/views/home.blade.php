@@ -104,15 +104,14 @@
                                     @if (Auth::user()->role === 'admin')
                                         <div class="flex justify-center gap-2 flex-wrap">
                                             <button
-                                                class="flex items-center gap-1 px-3 py-1.5 bg-yellow-400 text-gray-900 rounded-lg hover:bg-yellow-500 transition"
+                                                class="flex items-center gap-1 px-3 py-1.5 bg-yellow-400 text-white rounded-lg hover:bg-yellow-500 transition"
                                                 onclick="openUpdateModal({{ $employee->id }}, {{ $employee->user->id ?? 'null' }}, '{{ addslashes($employee->user->name ?? '') }}', '{{ addslashes($employee->position) }}', '{{ addslashes($employee->user->email ?? '') }}', '{{ addslashes($employee->emp_pic ? asset('storage/' . $employee->emp_pic) : asset('pics/default.png')) }}')">
                                                 <i class='bx bx-edit'></i> Edit
                                             </button>
-                                            <button
-                                                class="flex items-center gap-1 px-3 py-1.5 bg-cyan-500 text-white rounded-lg hover:bg-cyan-600 transition"
-                                                onclick="window.location.href='{{ route('employees.attendance.page', $employee->id) }}'">
+                                            <a href="{{ route('employees.attendance.page', $employee->id) }}"
+                                                class="flex items-center gap-1 px-3 py-1.5 bg-cyan-500 text-white rounded-lg hover:bg-cyan-600 transition">
                                                 <i class='bx bx-calendar-check'></i> Attendances
-                                            </button>
+                                            </a>
                                             <form method="POST" action="{{ route('employees.destroy', $employee->id) }}"
                                                 onsubmit="return confirm('Are you sure?')">
                                                 @csrf

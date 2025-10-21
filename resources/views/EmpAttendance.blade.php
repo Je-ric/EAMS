@@ -46,7 +46,7 @@
                                 {{ $a->time_out ? \Carbon\Carbon::parse($a->time_out)->format('h:i A') : 'No record yet' }}
                             </td>
                             <td class="px-3 py-2 border">
-                                <button class="flex items-center gap-1 px-3 py-1.5 bg-amber-500 text-white rounded-lg hover:bg-yellow-500 transition"
+                                <button class="flex items-center gap-1 px-3 py-1.5 bg-yellow-500 text-white rounded-lg hover:bg-yellow-500 transition"
                                     onclick="openEditAttendance({{ $a->id }}, '{{ $a->time_in ?? '' }}', '{{ $a->time_out ?? '' }}', '{{ $a->date }}')">
                                     <i class="bx bx-edit"></i> Edit Attendance
                                 </button>

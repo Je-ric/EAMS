@@ -1,8 +1,7 @@
 @extends('layouts.app')
 
 @section('page-content')
-    <h1 class="text-center font">Date: </h1>
-    <div class="container mx-auto max-w-7xl my-12 p-8 bg-white shadow-xl rounded-2xl border border-gray-200">
+    <div class="max-w-7xl mx-auto bg-white rounded-xl shadow-lg p-8">
 
         <!-- Header -->
         <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">

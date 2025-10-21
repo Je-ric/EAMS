@@ -2,12 +2,12 @@
 
 @section('page-content')
     <div class="container mx-auto my-12 p-8 bg-white shadow-xl rounded-2xl border border-gray-200">
+
         <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
             <div>
                 <h1 class="text-4xl font-extrabold text-gray-900 tracking-tight">
                     Employee Attendance
                 </h1>
-
                 @auth
                     @if (Auth::user()->role === 'admin')
                         <p class="text-gray-600 text-sm mt-1">
@@ -18,109 +18,108 @@
             </div>
 
             <div class="flex gap-3 items-center w-full md:w-auto">
-
-                <div class="search-bar">
-                    <button class="search-btn"><i class="fas fa-search"></i></button>
-                    <input type="text" id="searchInput" placeholder="Search here...">
+                <div class="flex items-center border rounded-lg overflow-hidden">
+                    <button class="px-3 py-2 text-gray-500 hover:bg-gray-100 transition"><i class='bx bx-search'></i></button>
+                    <input type="text" id="searchInput" placeholder="Search here..."
+                        class="flex-1 px-3 py-2 focus:outline-none">
                 </div>
+
                 @auth
                     @if (Auth::user()->role === 'admin')
-                        <button class="btn btn-primary" onclick="attendanceSummaryModal.showModal()">
-                            <i class="fas fa-clipboard-list"></i> View Attendance Summary
+                        <button
+                            class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition"
+                            onclick="attendanceSummaryModal.showModal()">
+                            <i class='bx bx-clipboard'></i> View Attendance Summary
                         </button>
-                        <button class="btn btn-success gap-2" onclick="addModal.showModal()">
-                            <i class="fas fa-user-plus"></i> Add Employee
+
+                        <button
+                            class="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg shadow hover:bg-green-600 transition"
+                            onclick="addModal.showModal()">
+                            <i class='bx bx-user-plus'></i> Add Employee
                         </button>
 
                         <form method="POST" action="{{ route('admin.logout') }}">
                             @csrf
-                            <button type="submit" class="btn btn-error gap-2 shadow-lg hover:scale-105 transition-transform">
-                                <i class="fas fa-sign-out-alt"></i> Logout
+                            <button type="submit"
+                                class="flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-lg shadow hover:bg-red-600 transition">
+                                <i class='bx bx-log-out'></i> Logout
                             </button>
                         </form>
                     @endif
                 @else
-                    <button class="btn btn-primary gap-2 shadow-lg hover:scale-105 transition-transform"
+                    <button
+                        class="flex items-center gap-2 px-4 py-2 bg-gray-700 text-white rounded-lg shadow hover:bg-gray-800 transition"
                         onclick="document.getElementById('adminDialog').showModal()">
-                        <i class="fas fa-user-shield"></i> Admin
+                        <i class='bx bx-shield'></i> Admin
                     </button>
                 @endauth
             </div>
         </div>
 
-
         <!-- Table -->
         <div class="overflow-x-auto">
-            <table class="table table-zebra table-hover w-full text-center border border-gray-200 rounded-lg">
+            <table class="w-full text-center border border-gray-200 rounded-lg table-auto">
                 <thead class="bg-gradient-to-r from-blue-600 to-blue-500 text-white text-lg uppercase">
                     <tr>
-                        <th>#</th>
-                        <th>Profile</th>
-                        <th>Full Name</th>
-                        <th>Position</th>
-                        @auth
-                            @if (Auth::user()->role === 'admin')
-                                <th>Actions</th>
-                            @endif
-                        @else
-                            <th>Actions</th>
-                        @endauth
+                        <th class="px-4 py-2">#</th>
+                        <th class="px-4 py-2">Profile</th>
+                        <th class="px-4 py-2">Full Name</th>
+                        <th class="px-4 py-2">Position</th>
+                        <th class="px-4 py-2">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse ($employees as $index => $employee)
                         <tr class="hover:bg-blue-50 transition-colors">
-                            <td class="font-medium text-gray-700">{{ $index + 1 }}</td>
-                            <td>
+                            <td class="px-4 py-2 font-medium text-gray-700">{{ $index + 1 }}</td>
+                            <td class="px-4 py-2">
                                 <img src="{{ $employee->emp_pic ? asset('storage/' . $employee->emp_pic) : 'https://via.placeholder.com/80x50' }}"
                                     alt="Profile"
                                     class="mx-auto rounded-full border border-gray-300 w-12 h-12 object-cover">
                             </td>
-                            <td class="text-gray-800 font-semibold">{{ $employee->user->name ?? 'N/A' }}</td>
-                            <td class="text-gray-600">{{ $employee->position }}</td>
-
-                            <td>
+                            <td class="px-4 py-2 text-gray-800 font-semibold">{{ $employee->user->name ?? 'N/A' }}</td>
+                            <td class="px-4 py-2 text-gray-600">{{ $employee->position }}</td>
+                            <td class="px-4 py-2">
                                 @auth
                                     @if (Auth::user()->role === 'admin')
-                                        <div class="flex justify-center gap-2">
-                                            <button class="btn btn-warning btn-sm"
-                                                onclick="openUpdateModal({{ $employee->id }}, {{ $employee->user->id ?? 'null' }},
-                                                                    '{{ addslashes($employee->user->name ?? '') }}',
-                                                                    '{{ addslashes($employee->position) }}',
-                                                                    '{{ addslashes($employee->user->email ?? '') }}',
-                                                                    '{{ addslashes($employee->emp_pic ? asset('storage/' . $employee->emp_pic) : asset('pics/default.png')) }}')">
-                                                <i class="fas fa-user-edit"></i> Edit
+                                        <div class="flex justify-center gap-2 flex-wrap">
+                                            <button
+                                                class="flex items-center gap-1 px-3 py-1.5 bg-yellow-400 text-gray-900 font-semibold rounded-lg shadow hover:bg-yellow-500 transition"
+                                                onclick="openUpdateModal({{ $employee->id }}, {{ $employee->user->id ?? 'null' }}, '{{ addslashes($employee->user->name ?? '') }}', '{{ addslashes($employee->position) }}', '{{ addslashes($employee->user->email ?? '') }}', '{{ addslashes($employee->emp_pic ? asset('storage/' . $employee->emp_pic) : asset('pics/default.png')) }}')">
+                                                <i class='bx bx-edit text-lg'></i> Edit
                                             </button>
-                                            <button class="btn btn-info btn-sm" 
-                                                    onclick="openEmpAttendanceModal({{ $employee->id }}, '{{ $employee->user->name }}', '{{ $employee->emp_pic ? asset('storage/' . $employee->emp_pic) : asset('pics/default.png') }}')">
-                                                    <i class="fas fa-calendar-check"></i> View Attendance
+
+                                            <button
+                                                class="flex items-center gap-1 px-3 py-1.5 bg-cyan-500 text-white font-semibold rounded-lg shadow hover:bg-cyan-600 transition"
+                                                onclick="openEmpAttendanceModal({{ $employee->id }}, '{{ $employee->user->name }}', '{{ $employee->emp_pic ? asset('storage/' . $employee->emp_pic) : asset('pics/default.png') }}')">
+                                                <i class='bx bx-calendar-check text-lg'></i> View Attendance
                                             </button>
 
                                             <form method="POST" action="{{ route('employees.destroy', $employee->id) }}"
                                                 onsubmit="return confirm('Are you sure?')">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="btn btn-error btn-sm hover:bg-red-600">
-                                                    <i class="fas fa-trash"></i> Delete
+                                                <button type="submit"
+                                                    class="flex items-center gap-1 px-3 py-1.5 bg-red-500 text-white font-semibold rounded-lg shadow hover:bg-red-600 transition">
+                                                    <i class='bx bx-trash text-lg'></i> Delete
                                                 </button>
                                             </form>
                                         </div>
-                                    @endif
-                                @else
-                                    <button
-                                        class="btn btn-primary flex items-center gap-2 px-4 py-2 rounded-lg shadow hover:scale-105 transition-transform"
-                                        onclick="openAttendanceModal('{{ $employee->user->email }}', '{{ $employee->user->name }}', '{{ $employee->emp_pic ? asset('storage/' . $employee->emp_pic) : asset('pics/default.png') }}', 'time-in')">
-                                        <i class="fas fa-sign-in-alt"></i>
-                                        <span>Time In</span>
-                                    </button>
+                                    @else
+                                        <div class="flex justify-center gap-2 flex-wrap">
+                                            <button
+                                                class="flex items-center gap-1 px-3 py-1.5 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 transition"
+                                                onclick="openAttendanceModal('{{ $employee->user->email }}', '{{ $employee->user->name }}', '{{ $employee->emp_pic ? asset('storage/' . $employee->emp_pic) : asset('pics/default.png') }}', 'time-in')">
+                                                <i class='bx bx-log-in'></i> Time In
+                                            </button>
 
-                                    <!-- Time Out Button -->
-                                    <button
-                                        class="btn btn-error flex items-center gap-2 px-4 py-2 rounded-lg shadow hover:scale-105 transition-transform"
-                                        onclick="openAttendanceModal('{{ $employee->user->email }}', '{{ $employee->user->name }}', '{{ asset('storage/' . $employee->emp_pic) }}', 'time-out')">
-                                        <i class="fas fa-sign-out-alt"></i>
-                                        <span>Time Out</span>
-                                    </button>
+                                            <button
+                                                class="flex items-center gap-1 px-3 py-1.5 bg-red-500 text-white font-semibold rounded-lg shadow hover:bg-red-600 transition"
+                                                onclick="openAttendanceModal('{{ $employee->user->email }}', '{{ $employee->user->name }}', '{{ asset('storage/' . $employee->emp_pic) }}', 'time-out')">
+                                                <i class='bx bx-log-out'></i> Time Out
+                                            </button>
+                                        </div>
+                                    @endif
                                 @endauth
                             </td>
                         </tr>
@@ -130,22 +129,20 @@
                         </tr>
                     @endforelse
                 </tbody>
-
             </table>
         </div>
 
         <div class="flex justify-between items-center mt-6">
-            <button class="btn btn-outline btn-sm hover:bg-gray-100">Previous</button>
+            <button class="px-3 py-1.5 border rounded-lg hover:bg-gray-100 transition">Previous</button>
             <span class="text-gray-700 font-medium">Page 1 of 1</span>
-            <button class="btn btn-outline btn-sm hover:bg-gray-100">Next</button>
+            <button class="px-3 py-1.5 border rounded-lg hover:bg-gray-100 transition">Next</button>
         </div>
-    </div>
 
+    </div>
 
     @include('partials.passwordModal')
     @include('partials.updateEmpModal')
     @include('partials.EmpAttendanceModal')
-
     @include('partials.adminModal')
     @include('partials.addEmpModal')
     @include('partials.viewAttendanceSummary')
@@ -167,16 +164,13 @@
         }
 
         function openEmpAttendanceModal(id, name, picUrl) {
-            // Set employee info
             document.getElementById('attendanceEmpName').textContent = name ?? '';
             var preview = document.getElementById('attendanceEmpPic');
             if (preview && picUrl) preview.src = picUrl;
 
-            // Show loading
             const summary = document.getElementById('attendanceSummaryContent');
             summary.innerHTML = `<p class="text-center text-gray-400">Loading attendance...</p>`;
 
-            // Fetch attendance
             fetch(`${attendanceBase}/${id}/attendance`)
                 .then(res => {
                     if (!res.ok) throw new Error('Network response was not ok');
@@ -196,11 +190,11 @@
                             const row = document.createElement('div');
                             row.className = 'mb-2 text-left';
                             row.innerHTML = `
-                                <p><strong>Date:</strong> ${a.date}</p>
-                                <p><strong>Time In:</strong> ${a.time_in ?? '-'}</p>
-                                <p><strong>Time Out:</strong> ${a.time_out ?? '-'}</p>
-                                <hr class="my-1"/>
-                            `;
+                            <p><strong>Date:</strong> ${a.date}</p>
+                            <p><strong>Time In:</strong> ${a.time_in ?? '-'}</p>
+                            <p><strong>Time Out:</strong> ${a.time_out ?? '-'}</p>
+                            <hr class="my-1"/>
+                        `;
                             summary.appendChild(row);
                         });
                     }
@@ -223,4 +217,3 @@
             passwordDialog.showModal();
         }
     </script>
-@endsection

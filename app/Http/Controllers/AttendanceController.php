@@ -3,15 +3,16 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Carbon\Carbon;
 use App\Models\Employee;
 use App\Models\Attendance;
 use App\Models\User;
 
 class AttendanceController extends Controller
 {
+    /**
+     * Record Time In
+     */
     public function timeIn(Request $request)
     {
         $request->validate([
@@ -20,7 +21,6 @@ class AttendanceController extends Controller
         ]);
 
         $user = User::where('email', $request->email)->first();
-
         if (!$user || !Hash::check($request->password, $user->password)) {
             return back()->with('error', 'Invalid credentials.');
         }
@@ -41,13 +41,16 @@ class AttendanceController extends Controller
             return back()->with('error', 'You already timed in today.');
         }
 
-        $attendance->time_in = now()->format('H:i:s'); // <-- important fix
+        // Store in 24-hour format
+        $attendance->time_in = now()->format('H:i:s');
         $attendance->save();
 
         return back()->with('success', 'Time-in recorded successfully.');
     }
 
-
+    /**
+     * Record Time Out
+     */
     public function timeOut(Request $request)
     {
         $request->validate([
@@ -56,7 +59,6 @@ class AttendanceController extends Controller
         ]);
 
         $user = User::where('email', $request->email)->first();
-
         if (!$user || !Hash::check($request->password, $user->password)) {
             return back()->with('error', 'Invalid credentials.');
         }
@@ -73,36 +75,46 @@ class AttendanceController extends Controller
             'date' => $today,
         ]);
 
-        if ($attendance->time_in) {
-            return back()->with('error', 'You already timed in today.');
+        if (!$attendance->time_in) {
+            return back()->with('error', 'You cannot time out before timing in.');
         }
 
-        $attendance->time_out = now()->format('H:i:s');
+        if ($attendance->time_out) {
+            return back()->with('error', 'You already timed out today.');
+        }
 
+        // Store in 24-hour format
+        $attendance->time_out = now()->format('H:i:s');
         $attendance->save();
 
-        return back()->with('success', 'Time-in recorded successfully.');
+        return back()->with('success', 'Time-out recorded successfully.');
     }
 
-
+    /**
+     * Update attendance (accepts 12-hour input, stores 24-hour)
+     */
     public function updateAttendance(Request $request, $id)
-{
-    $request->validate([
-        'time_in'  => 'nullable|date_format:H:i:s',
-        'time_out' => 'nullable|date_format:H:i:s',
-    ]);
+    {
+        $request->validate([
+            'time_in'  => ['nullable', 'regex:/^\d{1,2}:\d{2}\s?(AM|PM)$/i'],
+            'time_out' => ['nullable', 'regex:/^\d{1,2}:\d{2}\s?(AM|PM)$/i'],
+        ]);
 
-    $attendance = Attendance::findOrFail($id);
+        $attendance = Attendance::findOrFail($id);
 
-    $attendance->update([
-        'time_in'  => $request->time_in,
-        'time_out' => $request->time_out,
-    ]);
+        // Convert 12-hour format to 24-hour for DB storage
+        $timeIn = $request->time_in ? date('H:i:s', strtotime($request->time_in)) : null;
+        $timeOut = $request->time_out ? date('H:i:s', strtotime($request->time_out)) : null;
 
-    return response()->json([
-        'success' => true,
-        'message' => 'Attendance updated successfully',
-        'data' => $attendance
-    ]);
-}
+        $attendance->update([
+            'time_in'  => $timeIn,
+            'time_out' => $timeOut,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Attendance updated successfully',
+            'data' => $attendance
+        ]);
+    }
 }

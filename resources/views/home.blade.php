@@ -67,6 +67,7 @@
                         <th class="px-4 py-2">Profile</th>
                         <th class="px-4 py-2">Full Name</th>
                         <th class="px-4 py-2">Position</th>
+                        <th class="px-4 py-2">Attendance</th>
                         <th class="px-4 py-2">Actions</th>
                     </tr>
                 </thead>
@@ -81,6 +82,22 @@
                             </td>
                             <td class="px-4 py-2 font-semibold">{{ $employee->user->name ?? 'N/A' }}</td>
                             <td class="px-4 py-2 text-gray-600">{{ $employee->position }}</td>
+                            <td class="px-4 py-2 text-gray-700">
+                                @php
+                                    $last = $employee->attendances->first();
+                                @endphp
+
+                                @if($last)
+                                    {{ \Carbon\Carbon::parse($last->time_in, 'Asia/Manila')->format('h:i A') ?? '-' }} -
+                                    @if($last->time_out)
+                                        {{ \Carbon\Carbon::parse($last->time_out, 'Asia/Manila')->format('h:i A') }}
+                                    @else
+                                        <span class="text-yellow-500 font-semibold">Active</span>
+                                    @endif
+                                @else
+                                    <span class="text-red-500 font-semibold">No record</span>
+                                @endif
+                            </td>
                             <td class="px-4 py-2">
                                 @auth
                                     @if (Auth::user()->role === 'admin')
@@ -235,33 +252,56 @@
             document.getElementById('editAttendanceModal').showModal();
         }
 
-        document.getElementById('editAttendanceForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const id = document.getElementById('edit_attendance_id').value;
-            const timeIn = document.getElementById('edit_time_in').value;
-            const timeOut = document.getElementById('edit_time_out').value;
+       document.getElementById('editAttendanceForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const id = document.getElementById('edit_attendance_id').value;
 
-            fetch(`/attendance/${id}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    body: JSON.stringify({
-                        time_in: timeIn,
-                        time_out: timeOut
-                    })
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        alert(data.message);
-                        location.reload();
-                    } else {
-                        alert('Failed to update attendance.');
-                    }
-                })
-                .catch(err => console.error(err));
-        });
+    let timeIn = document.getElementById('edit_time_in').value.trim();
+    let timeOut = document.getElementById('edit_time_out').value.trim();
+
+    // Helper to convert 12-hour to 24-hour format (HH:mm)
+    function to24Hour(str) {
+        if (!str) return null;
+        const match = str.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+        if (!match) return null;
+        let hour = parseInt(match[1], 10);
+        const min = match[2];
+        const meridian = match[3].toUpperCase();
+        if (meridian === 'PM' && hour !== 12) hour += 12;
+        if (meridian === 'AM' && hour === 12) hour = 0;
+        return `${hour.toString().padStart(2, '0')}:${min}`;
+    }
+
+    // Only convert if value is present
+    timeIn = timeIn ? to24Hour(timeIn) : null;
+    timeOut = timeOut ? to24Hour(timeOut) : null;
+
+    // Validate format
+    if ((document.getElementById('edit_time_in').value && !timeIn) ||
+        (document.getElementById('edit_time_out').value && !timeOut)) {
+        alert('Please enter time in the format HH:MM AM/PM (e.g. 08:30 AM)');
+        return;
+    }
+
+    fetch(`/attendance/${id}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({ time_in: timeIn, time_out: timeOut })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            location.reload();
+        } else {
+            alert('Failed to update attendance.');
+        }
+    })
+    .catch(err => console.error(err));
+});
+
     </script>
 @endsection

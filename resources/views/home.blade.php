@@ -186,17 +186,31 @@
                     if (data.length === 0) {
                         summary.innerHTML = `<p class="text-gray-500">No attendance records yet.</p>`;
                     } else {
+                        // Build table
+                        let table = `<table class="min-w-full border border-gray-300 rounded-lg">
+                            <thead class="bg-blue-100">
+                                <tr>
+                                    <th class="px-3 py-2 border">Date</th>
+                                    <th class="px-3 py-2 border">Time In</th>
+                                    <th class="px-3 py-2 border">Time Out</th>
+                                    <th class="px-3 py-2 border">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>`;
                         data.forEach(a => {
-                            const row = document.createElement('div');
-                            row.className = 'mb-2 text-left';
-                            row.innerHTML = `
-                            <p><strong>Date:</strong> ${a.date}</p>
-                            <p><strong>Time In:</strong> ${a.time_in ?? '-'}</p>
-                            <p><strong>Time Out:</strong> ${a.time_out ?? '-'}</p>
-                            <hr class="my-1"/>
-                        `;
-                            summary.appendChild(row);
+                            table += `<tr>
+                                <td class="px-3 py-2 border">${a.date}</td>
+                                <td class="px-3 py-2 border">${a.time_in ?? '-'}</td>
+                                <td class="px-3 py-2 border">${a.time_out ?? '-'}</td>
+                                <td class="px-3 py-2 border">
+                                    <button class="btn btn-xs btn-warning" onclick="editAttendance(${a.id})">
+                                        <i class="fas fa-edit"></i> Edit
+                                </button>
+                            </td>
+                        </tr>`;
                         });
+                        table += `</tbody></table>`;
+                        summary.innerHTML = table;
                     }
                 })
                 .catch(err => {
@@ -216,4 +230,11 @@
             form.action = (actionType === 'time-out') ? timeOutUrl : timeInUrl;
             passwordDialog.showModal();
         }
+
+        // Add this stub function for edit button (implement modal logic as needed)
+        function editAttendance(attendanceId) {
+            alert('Edit Attendance ID: ' + attendanceId);
+            // You can open a modal here or redirect to an edit page
+        }
     </script>
+@endsection

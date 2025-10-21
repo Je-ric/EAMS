@@ -120,4 +120,27 @@ class EmployeeController extends Controller
 
         return back()->with('success', 'Employee deleted successfully.');
     }
+
+    public function getAttendance($id)
+    {
+        try {
+            $employee = Employee::findOrFail($id);
+
+            $attendance = $employee->attendances()
+                ->limit(5)
+                ->get(['date', 'time_in', 'time_out']);
+
+            $data = $attendance->map(function ($a) {
+                return [
+                    'date'     => $a->date,
+                    'time_in'  => $a->time_in ?: null,
+                    'time_out' => $a->time_out ?: null,
+                ];
+            });
+
+            return response()->json(['success' => true, 'data' => $data], 200);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Could not load attendance.'], 500);
+        }
+    }
 }

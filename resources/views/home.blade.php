@@ -91,6 +91,10 @@
                                                                     '{{ addslashes($employee->emp_pic ? asset('storage/' . $employee->emp_pic) : asset('pics/default.png')) }}')">
                                                 <i class="fas fa-user-edit"></i> Edit
                                             </button>
+                                            <button class="btn btn-info btn-sm" 
+                                                    onclick="openEmpAttendanceModal({{ $employee->id }}, '{{ $employee->user->name }}', '{{ $employee->emp_pic ? asset('storage/' . $employee->emp_pic) : asset('pics/default.png') }}')">
+                                                    <i class="fas fa-calendar-check"></i> View Attendance
+                                            </button>
 
                                             <form method="POST" action="{{ route('employees.destroy', $employee->id) }}"
                                                 onsubmit="return confirm('Are you sure?')">
@@ -140,12 +144,17 @@
 
     @include('partials.passwordModal')
     @include('partials.updateEmpModal')
+    @include('partials.EmpAttendanceModal')
 
     @include('partials.adminModal')
     @include('partials.addEmpModal')
     @include('partials.viewAttendanceSummary')
 
     <script>
+        const timeInUrl = "{{ route('attendance.timeIn') }}";
+        const timeOutUrl = "{{ route('attendance.timeOut') }}";
+        const attendanceBase = "{{ url('/employees') }}";
+
         function openUpdateModal(id, userId, name, position, email, picUrl) {
             document.getElementById('update_id').value = id;
             document.getElementById('update_user_id').value = userId ?? '';
@@ -157,8 +166,52 @@
             document.getElementById('updateModal').showModal();
         }
 
-        const timeInUrl = "{{ route('attendance.timeIn') }}";
-        const timeOutUrl = "{{ route('attendance.timeOut') }}";
+        function openEmpAttendanceModal(id, name, picUrl) {
+            // Set employee info
+            document.getElementById('attendanceEmpName').textContent = name ?? '';
+            var preview = document.getElementById('attendanceEmpPic');
+            if (preview && picUrl) preview.src = picUrl;
+
+            // Show loading
+            const summary = document.getElementById('attendanceSummaryContent');
+            summary.innerHTML = `<p class="text-center text-gray-400">Loading attendance...</p>`;
+
+            // Fetch attendance
+            fetch(`${attendanceBase}/${id}/attendance`)
+                .then(res => {
+                    if (!res.ok) throw new Error('Network response was not ok');
+                    return res.json();
+                })
+                .then(payload => {
+                    summary.innerHTML = '';
+                    if (!payload.success) {
+                        summary.innerHTML = `<p class="text-red-500">Unable to load attendance.</p>`;
+                        return;
+                    }
+                    const data = payload.data || [];
+                    if (data.length === 0) {
+                        summary.innerHTML = `<p class="text-gray-500">No attendance records yet.</p>`;
+                    } else {
+                        data.forEach(a => {
+                            const row = document.createElement('div');
+                            row.className = 'mb-2 text-left';
+                            row.innerHTML = `
+                                <p><strong>Date:</strong> ${a.date}</p>
+                                <p><strong>Time In:</strong> ${a.time_in ?? '-'}</p>
+                                <p><strong>Time Out:</strong> ${a.time_out ?? '-'}</p>
+                                <hr class="my-1"/>
+                            `;
+                            summary.appendChild(row);
+                        });
+                    }
+                })
+                .catch(err => {
+                    summary.innerHTML = `<p class="text-red-500">Error loading attendance. Check console / logs.</p>`;
+                    console.error('Attendance fetch error:', err);
+                });
+
+            document.getElementById('EmpAttendanceModal').showModal();
+        }
 
         function openAttendanceModal(email, name, picUrl, actionType) {
             const form = document.getElementById('attendanceForm');

@@ -19,6 +19,8 @@ class Employee extends Model
 
     public function attendances()
     {
-        return $this->hasMany(Attendance::class, 'emp_id');
+        return $this->hasMany(Attendance::class, 'emp_id')
+                    ->orderBy('date', 'desc');
     }
+
 }

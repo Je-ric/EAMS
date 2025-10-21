@@ -2,13 +2,21 @@
 
 @section('page-content')
     <div class="max-w-7xl mx-auto bg-white rounded-xl shadow-lg p-8">
-        <div class="flex items-center gap-4 mb-6">
-            <img src="{{ $employee->emp_pic ? asset('storage/' . $employee->emp_pic) : 'https://via.placeholder.com/100' }}"
-                class="w-16 h-16 rounded-full border object-cover">
-            <div>
-                <h2 class="text-2xl font-bold text-blue-700">{{ $employee->user->name }}</h2>
-                <p class="text-gray-600">{{ $employee->position }}</p>
+        <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+            <div class="flex items-center gap-4">
+                <img src="{{ $employee->emp_pic ? asset('storage/' . $employee->emp_pic) : 'https://via.placeholder.com/100' }}"
+                    class="w-16 h-16 rounded-full border object-cover">
+                <div>
+                    <h2 class="text-2xl font-bold text-blue-700">{{ $employee->user->name }}</h2>
+                    <p class="text-gray-600">{{ $employee->position }}</p>
+                </div>
             </div>
+
+            <a href="{{ route('index') }}"
+                class="border border-gray-300 rounded-md px-4 py-2 hover:bg-gray-100 transition">
+                Back
+            </a>
+
         </div>
 
         <div class="mb-4 flex justify-between items-center">
@@ -38,15 +46,16 @@
                 </thead>
                 <tbody>
                     @forelse($attendances as $a)
-                        <tr>
+                        <tr id="attendance-row-{{ $a->id }}">
                             <td class="px-3 py-2 border">{{ \Carbon\Carbon::parse($a->date)->format('D, M d, Y') }}</td>
-                            <td class="px-3 py-2 border">
+                            <td class="px-3 py-2 border attendance-times">
                                 {{ $a->time_in ? \Carbon\Carbon::parse($a->time_in)->format('h:i A') : '-' }}
                                 -
                                 {{ $a->time_out ? \Carbon\Carbon::parse($a->time_out)->format('h:i A') : 'No record yet' }}
                             </td>
                             <td class="px-3 py-2 border">
-                                <button class="flex items-center gap-1 px-3 py-1.5 bg-yellow-500 text-white rounded-lg hover:bg-yellow-500 transition"
+                                <button
+                                    class="flex items-center gap-1 px-3 py-1.5 bg-yellow-500 text-white rounded-lg hover:bg-yellow-500 transition"
                                     onclick="openEditAttendance({{ $a->id }}, '{{ $a->time_in ?? '' }}', '{{ $a->time_out ?? '' }}', '{{ $a->date }}')">
                                     <i class="bx bx-edit"></i> Edit Attendance
                                 </button>
@@ -72,10 +81,10 @@
             document.getElementById('editAttendanceModal').showModal();
 
             // Disable logic
-            const today = new Date().toISOString().slice(0, 10);
-            const isToday = date === today;
-            document.getElementById('edit_time_in').disabled = isToday && !!timeIn;
-            document.getElementById('edit_time_out').disabled = !timeIn;
+            // const today = new Date().toISOString().slice(0, 10);
+            // const isToday = date === today;
+            // document.getElementById('edit_time_in').disabled = isToday && !!timeIn;
+            // document.getElementById('edit_time_out').disabled = !timeIn;
         }
 
         document.getElementById('editAttendanceForm').addEventListener('submit', function(e) {
@@ -102,7 +111,24 @@
                 .then(data => {
                     if (data.success) {
                         alert(data.message);
-                        location.reload();
+                        // Update the table row in real time
+                        const row = document.getElementById('attendance-row-' + id);
+                        if (row) {
+                            const timesCell = row.querySelector('.attendance-times');
+                            // Format times to h:i A
+                            function formatTime(val) {
+                                if (!val) return '-';
+                                const [h, m] = val.split(':');
+                                const hour = ((+h + 11) % 12 + 1);
+                                const ampm = +h >= 12 ? 'PM' : 'AM';
+                                return `${hour}:${m} ${ampm}`;
+                            }
+                            timesCell.innerHTML =
+                                (data.data.time_in ? formatTime(data.data.time_in) : '-') +
+                                ' - ' +
+                                (data.data.time_out ? formatTime(data.data.time_out) : 'No record yet');
+                        }
+                        editAttendanceModal.close();
                     } else {
                         alert('Failed to update attendance.');
                     }

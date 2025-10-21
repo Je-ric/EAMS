@@ -83,4 +83,26 @@ class AttendanceController extends Controller
 
         return back()->with('success', 'Time-in recorded successfully.');
     }
+
+
+    public function updateAttendance(Request $request, $id)
+{
+    $request->validate([
+        'time_in'  => 'nullable|date_format:H:i:s',
+        'time_out' => 'nullable|date_format:H:i:s',
+    ]);
+
+    $attendance = Attendance::findOrFail($id);
+
+    $attendance->update([
+        'time_in'  => $request->time_in,
+        'time_out' => $request->time_out,
+    ]);
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Attendance updated successfully',
+        'data' => $attendance
+    ]);
+}
 }

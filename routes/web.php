@@ -24,3 +24,4 @@ Route::get('/employees/{id}/attendance', [EmployeeController::class, 'getAttenda
 
 Route::post('/attendance/time-in', [AttendanceController::class, 'timeIn'])->name('attendance.timeIn');
 Route::post('/attendance/time-out', [AttendanceController::class, 'timeOut'])->name('attendance.timeOut');
+Route::put('/attendance/{id}', [AttendanceController::class, 'updateAttendance'])->name('attendance.update');

@@ -1,30 +1,34 @@
 <dialog id="passwordDialog" class="modal">
-    <form id="attendanceForm" method="POST" action="">
+    <form id="attendanceForm" method="POST" action="" class="modal-box max-w-md p-6 rounded-xl shadow-lg bg-white">
+
         @csrf
-        <div class="modal-box max-w-md">
-            <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                <i class="fas fa-lock text-blue-600"></i> Confirm Attendance
-            </h3>
 
-            <div class="flex flex-col items-center mb-4">
-                <img id="empPicPreview" src="https://via.placeholder.com/100" alt="Employee"
-                    class="w-24 h-24 rounded-full object-cover border border-gray-300 mb-2">
-                <span id="empNameDisplay" class="font-semibold text-gray-700">Employee Name</span>
-            </div>
+        <!-- Header -->
+        <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+            <i class="bx bx-lock-alt text-blue-600 text-xl"></i> Confirm Attendance
+        </h3>
 
-            <input type="hidden" name="email" id="empEmailInput">
+        <!-- Employee Info -->
+        <div class="flex flex-col items-center mb-4">
+            <img id="empPicPreview" src="https://via.placeholder.com/100" alt="Employee"
+                 class="w-24 h-24 rounded-full object-cover border border-gray-300 mb-2">
+            <span id="empNameDisplay" class="font-semibold text-gray-700">Employee Name</span>
+        </div>
 
-            <input type="password" name="password" placeholder="Enter your password"
-                class="input input-bordered w-full mb-4" required>
+        <!-- Hidden Email -->
+        <input type="hidden" name="email" id="empEmailInput">
 
-            <div class="modal-action">
-                <button type="button" class="btn btn-outline" onclick="passwordDialog.close()">Cancel</button>
-                <button type="submit" class="btn btn-primary">Confirm</button>
-            </div>
+        <!-- Password Input -->
+        <input type="password" name="password" placeholder="Enter your password" required
+               class="w-full border border-gray-300 rounded-md px-3 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+
+        <!-- Actions -->
+        <div class="flex justify-end gap-2">
+            <button type="button" class="border border-gray-300 rounded-md px-4 py-2 hover:bg-gray-100 transition" onclick="passwordDialog.close()">Cancel</button>
+            <button type="submit" class="bg-blue-600 text-white rounded-md px-4 py-2 hover:bg-blue-700 transition flex items-center gap-2">
+                <i class="bx bx-check"></i> Confirm
+            </button>
         </div>
     </form>
 
-    <form method="dialog" class="modal-backdrop">
-        <button>close</button>
-    </form>
 </dialog>

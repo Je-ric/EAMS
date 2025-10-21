@@ -6,30 +6,28 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>EAMS</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/daisyui"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&display=swap" rel="stylesheet">
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     @endif
+
     <style>
         body {
-            /* background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); */
+            background: linear-gradient(135deg, #c3c3c3 0%, #fbfdff 100%);
             font-family: "Oswald", sans-serif;
-            /* color: #fff; */
+        }
+
+        dialog::backdrop {
+            background-color: rgba(0, 0, 0, 0.4);
         }
     </style>
-
 </head>
-<body>
-    {{-- @include('includes.links') --}}
-    {{-- @include('layouts.header') --}}
-
-    <main class="container mx-auto">
+<body class="min-h-screen flex flex-col">
+    
+    <main class="flex-1 container mx-auto px-4 py-8">
         @yield('page-content')
     </main>
-
-    {{-- @include('layouts.footer') --}}
 
     @stack('scripts')
 </body>

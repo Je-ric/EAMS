@@ -29,7 +29,7 @@ class AuthController extends Controller
                 return back()->withErrors(['email' => 'Access denied. Admins only.']);
             }
 
-            return redirect()->route('admin.home');
+            return redirect()->route('index');
         }
 
         return back()->withErrors(['email' => 'Invalid email or password.']);

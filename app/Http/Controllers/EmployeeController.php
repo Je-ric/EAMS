@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Employee;
+use App\Models\Attendance;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Carbon\Carbon;
 
 class EmployeeController extends Controller
 {
@@ -142,5 +144,32 @@ class EmployeeController extends Controller
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => 'Could not load attendance.'], 500);
         }
+    }
+
+    public function attendancePage($id, Request $request)
+    {
+        $employee = Employee::with('user')->findOrFail($id);
+
+        // Get week start (Monday) and end (Sunday) for current page
+        $week = $request->query('week', 0); // 0 = current week, 1 = previous, etc.
+        $startOfWeek = now()->startOfWeek()->subWeeks($week);
+        $endOfWeek = now()->endOfWeek()->subWeeks($week);
+
+        $attendances = Attendance::where('emp_id', $employee->id)
+            ->whereBetween('date', [$startOfWeek->toDateString(), $endOfWeek->toDateString()])
+            ->orderBy('date', 'desc')
+            ->get();
+
+        // For pagination controls
+        $firstAttendance = Attendance::where('emp_id', $employee->id)->orderBy('date')->first();
+        $canPrev = $firstAttendance && $startOfWeek->gt(\Carbon\Carbon::parse($firstAttendance->date));
+
+        return view('EmpAttendance', compact(
+                    'employee',
+                    'attendances',
+                    'week',
+                    'canPrev',
+                    'startOfWeek',
+                    'endOfWeek'));
     }
 }

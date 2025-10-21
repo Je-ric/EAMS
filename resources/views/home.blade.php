@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('page-content')
+    <h1 class="text-center font">Date: </h1>
     <div class="container mx-auto max-w-7xl my-12 p-8 bg-white shadow-xl rounded-2xl border border-gray-200">
 
         <!-- Header -->
@@ -109,8 +110,8 @@
                                             </button>
                                             <button
                                                 class="flex items-center gap-1 px-3 py-1.5 bg-cyan-500 text-white rounded-lg hover:bg-cyan-600 transition"
-                                                onclick="openEmpAttendanceModal({{ $employee->id }}, '{{ $employee->user->name }}', '{{ $employee->emp_pic ? asset('storage/' . $employee->emp_pic) : asset('pics/default.png') }}')">
-                                                <i class='bx bx-calendar-check'></i> View
+                                                onclick="window.location.href='{{ route('employees.attendance.page', $employee->id) }}'">
+                                                <i class='bx bx-calendar-check'></i> Attendances
                                             </button>
                                             <form method="POST" action="{{ route('employees.destroy', $employee->id) }}"
                                                 onsubmit="return confirm('Are you sure?')">
@@ -159,8 +160,6 @@
 
     @include('partials.passwordModal')
     @include('partials.updateEmpModal')
-    @include('partials.EmpAttendanceModal')
-    @include('partials.editAttendanceModal')
     @include('partials.adminModal')
     @include('partials.addEmpModal')
     @include('partials.viewAttendanceSummary')
@@ -181,60 +180,6 @@
             document.getElementById('updateModal').showModal();
         }
 
-        function openEmpAttendanceModal(id, name, picUrl) {
-            document.getElementById('attendanceEmpName').textContent = name ?? '';
-            const preview = document.getElementById('attendanceEmpPic');
-            if (preview && picUrl) preview.src = picUrl;
-
-            const summary = document.getElementById('attendanceSummaryContent');
-            summary.innerHTML = `<p class="text-center text-gray-400">Loading attendance...</p>`;
-
-            fetch(`${attendanceBase}/${id}/attendance`)
-                .then(res => res.ok ? res.json() : Promise.reject('Failed'))
-                .then(payload => {
-                    summary.innerHTML = '';
-                    if (!payload.success) {
-                        summary.innerHTML = `<p class="text-red-500">Unable to load attendance.</p>`;
-                        return;
-                    }
-                    const data = payload.data || [];
-                    if (!data.length) {
-                        summary.innerHTML = `<p class="text-gray-500">No attendance records yet.</p>`;
-                    } else {
-                        let table = `<table class="min-w-full border border-gray-300 rounded-lg">
-                    <thead class="bg-blue-100">
-                        <tr>
-                            <th class="px-3 py-2 border">Date</th>
-                            <th class="px-3 py-2 border">Time In</th>
-                            <th class="px-3 py-2 border">Time Out</th>
-                            <th class="px-3 py-2 border">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>`;
-                        data.forEach(a => {
-                            table += `<tr>
-                        <td class="px-3 py-2 border">${a.date}</td>
-                        <td class="px-3 py-2 border">${a.time_in ?? '-'}</td>
-                        <td class="px-3 py-2 border">${a.time_out ?? '-'}</td>
-                        <td class="px-3 py-2 border">
-                            <button class="px-2 py-1 bg-yellow-400 rounded hover:bg-yellow-500 transition" onclick="openEditAttendance(${a.id}, '${a.time_in ?? ''}', '${a.time_out ?? ''}', '${a.date}')">
-                                <i class="bx bx-edit"></i> Edit
-                            </button>
-                        </td>
-                    </tr>`;
-                        });
-                        table += `</tbody></table>`;
-                        summary.innerHTML = table;
-                    }
-                })
-                .catch(err => {
-                    summary.innerHTML = `<p class="text-red-500">Error loading attendance.</p>`;
-                    console.error(err);
-                });
-
-            document.getElementById('EmpAttendanceModal').showModal();
-        }
-
         function openAttendanceModal(email, name, picUrl, actionType) {
             const form = document.getElementById('attendanceForm');
             document.getElementById('empEmailInput').value = email || '';
@@ -244,54 +189,5 @@
             form.action = actionType === 'time-out' ? timeOutUrl : timeInUrl;
             passwordDialog.showModal();
         }
-
-        function openEditAttendance(attendanceId, timeIn = '', timeOut = '', date = '') {
-            const empModal = document.getElementById('EmpAttendanceModal');
-            if (empModal && empModal.open) empModal.close();
-
-            document.getElementById('edit_attendance_id').value = attendanceId;
-            document.getElementById('edit_time_in').value = timeIn ? timeIn.slice(0, 5) : '';
-            document.getElementById('edit_time_out').value = timeOut ? timeOut.slice(0, 5) : '';
-            document.getElementById('editAttendanceModal').showModal();
-
-            // Disable logic
-            const today = new Date().toISOString().slice(0, 10);
-            const isToday = date === today;
-            document.getElementById('edit_time_in').disabled = isToday && !!timeIn;
-            document.getElementById('edit_time_out').disabled = !timeIn;
-        }
-
-        document.getElementById('editAttendanceForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const id = document.getElementById('edit_attendance_id').value;
-            let timeIn = document.getElementById('edit_time_in').value;
-            let timeOut = document.getElementById('edit_time_out').value;
-
-            // If not empty, append ":00" for seconds to match DB format
-            timeIn = timeIn ? timeIn + ':00' : null;
-            timeOut = timeOut ? timeOut + ':00' : null;
-
-            fetch(`/attendance/${id}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    body: JSON.stringify({
-                        time_in: timeIn,
-                        time_out: timeOut
-                    })
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        alert(data.message);
-                        location.reload();
-                    } else {
-                        alert('Failed to update attendance.');
-                    }
-                })
-                .catch(err => console.error(err));
-        });
     </script>
 @endsection

@@ -67,7 +67,7 @@
 
         <!-- Footer -->
         <div class="modal-action mt-6">
-            <form method="dialog" class="modal-backdrop">
+            <form method="dialog">
                 <button class="w-full border border-gray-300 rounded-md px-4 py-2 hover:bg-gray-100 transition">Close</button>
             </form>
         </div>

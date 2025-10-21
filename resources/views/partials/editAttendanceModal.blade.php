@@ -1,5 +1,5 @@
 <dialog id="editAttendanceModal" class="modal">
-    <form method="dialog" id="editAttendanceForm" class="modal-box max-w-md p-6 rounded-xl shadow-lg bg-white">
+    <form id="editAttendanceForm" class="modal-box max-w-md p-6 rounded-xl shadow-lg bg-white">
 
         <!-- Header -->
         <div class="flex justify-between items-center mb-4">
@@ -18,18 +18,14 @@
         <!-- Time In -->
         <div class="mb-3">
             <label for="edit_time_in" class="block text-gray-700 font-medium mb-1">Time In</label>
-            <input type="text" id="edit_time_in" name="time_in"
-                placeholder="e.g. 08:30 AM"
-                pattern="^(0[1-9]|1[0-2]):[0-5][0-9]\s?(AM|PM|am|pm)$"
+            <input type="time" id="edit_time_in" name="time_in"
                 class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
         </div>
 
         <!-- Time Out -->
         <div class="mb-3">
             <label for="edit_time_out" class="block text-gray-700 font-medium mb-1">Time Out</label>
-            <input type="text" id="edit_time_out" name="time_out"
-                placeholder="e.g. 05:15 PM"
-                pattern="^(0[1-9]|1[0-2]):[0-5][0-9]\s?(AM|PM|am|pm)$"
+            <input type="time" id="edit_time_out" name="time_out"
                 class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
         </div>
 

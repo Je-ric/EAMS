@@ -48,12 +48,12 @@
                         </form>
                     @endif
                 @else
-                        <button
-                            class="flex items-center gap-2 px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-800 transition"
-                            onclick="document.getElementById('adminDialog').showModal()">
-                            <i class='bx bx-shield'></i> Admin
-                        </button>
-                    
+                    <button
+                        class="flex items-center gap-2 px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-800 transition"
+                        onclick="document.getElementById('adminDialog').showModal()">
+                        <i class='bx bx-shield'></i> Admin
+                    </button>
+
                 @endauth
             </div>
         </div>
@@ -87,9 +87,9 @@
                                     $last = $employee->attendances->first();
                                 @endphp
 
-                                @if($last)
+                                @if ($last)
                                     {{ \Carbon\Carbon::parse($last->time_in, 'Asia/Manila')->format('h:i A') ?? '-' }} -
-                                    @if($last->time_out)
+                                    @if ($last->time_out)
                                         {{ \Carbon\Carbon::parse($last->time_out, 'Asia/Manila')->format('h:i A') }}
                                     @else
                                         <span class="text-yellow-500 font-semibold">Active</span>
@@ -124,18 +124,18 @@
                                         </div>
                                     @endif
                                 @else
-                                        <div class="flex justify-center gap-2 flex-wrap">
-                                            <button
-                                                class="flex items-center gap-1 px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-                                                onclick="openAttendanceModal('{{ $employee->user->email }}', '{{ $employee->user->name }}', '{{ $employee->emp_pic ? asset('storage/' . $employee->emp_pic) : asset('pics/default.png') }}', 'time-in')">
-                                                <i class='bx bx-log-in'></i> Time In
-                                            </button>
-                                            <button
-                                                class="flex items-center gap-1 px-3 py-1.5 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
-                                                onclick="openAttendanceModal('{{ $employee->user->email }}', '{{ $employee->user->name }}', '{{ asset('storage/' . $employee->emp_pic) }}', 'time-out')">
-                                                <i class='bx bx-log-out'></i> Time Out
-                                            </button>
-                                        </div>
+                                    <div class="flex justify-center gap-2 flex-wrap">
+                                        <button
+                                            class="flex items-center gap-1 px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                                            onclick="openAttendanceModal('{{ $employee->user->email }}', '{{ $employee->user->name }}', '{{ $employee->emp_pic ? asset('storage/' . $employee->emp_pic) : asset('pics/default.png') }}', 'time-in')">
+                                            <i class='bx bx-log-in'></i> Time In
+                                        </button>
+                                        <button
+                                            class="flex items-center gap-1 px-3 py-1.5 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
+                                            onclick="openAttendanceModal('{{ $employee->user->email }}', '{{ $employee->user->name }}', '{{ asset('storage/' . $employee->emp_pic) }}', 'time-out')">
+                                            <i class='bx bx-log-out'></i> Time Out
+                                        </button>
+                                    </div>
                                 @endauth
                             </td>
                         </tr>
@@ -217,7 +217,7 @@
                         <td class="px-3 py-2 border">${a.time_in ?? '-'}</td>
                         <td class="px-3 py-2 border">${a.time_out ?? '-'}</td>
                         <td class="px-3 py-2 border">
-                            <button class="px-2 py-1 bg-yellow-400 rounded hover:bg-yellow-500 transition" onclick="openEditAttendance(${a.id}, '${a.time_in ?? ''}', '${a.time_out ?? ''}')">
+                            <button class="px-2 py-1 bg-yellow-400 rounded hover:bg-yellow-500 transition" onclick="openEditAttendance(${a.id}, '${a.time_in ?? ''}', '${a.time_out ?? ''}', '${a.date}')">
                                 <i class="bx bx-edit"></i> Edit
                             </button>
                         </td>
@@ -245,63 +245,53 @@
             passwordDialog.showModal();
         }
 
-        function openEditAttendance(attendanceId, timeIn = '', timeOut = '') {
+        function openEditAttendance(attendanceId, timeIn = '', timeOut = '', date = '') {
+            const empModal = document.getElementById('EmpAttendanceModal');
+            if (empModal && empModal.open) empModal.close();
+
             document.getElementById('edit_attendance_id').value = attendanceId;
-            document.getElementById('edit_time_in').value = timeIn;
-            document.getElementById('edit_time_out').value = timeOut;
+            document.getElementById('edit_time_in').value = timeIn ? timeIn.slice(0, 5) : '';
+            document.getElementById('edit_time_out').value = timeOut ? timeOut.slice(0, 5) : '';
             document.getElementById('editAttendanceModal').showModal();
+
+            // Disable logic
+            const today = new Date().toISOString().slice(0, 10);
+            const isToday = date === today;
+            document.getElementById('edit_time_in').disabled = isToday && !!timeIn;
+            document.getElementById('edit_time_out').disabled = !timeIn;
         }
 
-       document.getElementById('editAttendanceForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const id = document.getElementById('edit_attendance_id').value;
+        document.getElementById('editAttendanceForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const id = document.getElementById('edit_attendance_id').value;
+            let timeIn = document.getElementById('edit_time_in').value;
+            let timeOut = document.getElementById('edit_time_out').value;
 
-    let timeIn = document.getElementById('edit_time_in').value.trim();
-    let timeOut = document.getElementById('edit_time_out').value.trim();
+            // If not empty, append ":00" for seconds to match DB format
+            timeIn = timeIn ? timeIn + ':00' : null;
+            timeOut = timeOut ? timeOut + ':00' : null;
 
-    // Helper to convert 12-hour to 24-hour format (HH:mm)
-    function to24Hour(str) {
-        if (!str) return null;
-        const match = str.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
-        if (!match) return null;
-        let hour = parseInt(match[1], 10);
-        const min = match[2];
-        const meridian = match[3].toUpperCase();
-        if (meridian === 'PM' && hour !== 12) hour += 12;
-        if (meridian === 'AM' && hour === 12) hour = 0;
-        return `${hour.toString().padStart(2, '0')}:${min}`;
-    }
-
-    // Only convert if value is present
-    timeIn = timeIn ? to24Hour(timeIn) : null;
-    timeOut = timeOut ? to24Hour(timeOut) : null;
-
-    // Validate format
-    if ((document.getElementById('edit_time_in').value && !timeIn) ||
-        (document.getElementById('edit_time_out').value && !timeOut)) {
-        alert('Please enter time in the format HH:MM AM/PM (e.g. 08:30 AM)');
-        return;
-    }
-
-    fetch(`/attendance/${id}`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-        },
-        body: JSON.stringify({ time_in: timeIn, time_out: timeOut })
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.success) {
-            alert(data.message);
-            location.reload();
-        } else {
-            alert('Failed to update attendance.');
-        }
-    })
-    .catch(err => console.error(err));
-});
-
+            fetch(`/attendance/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        time_in: timeIn,
+                        time_out: timeOut
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        location.reload();
+                    } else {
+                        alert('Failed to update attendance.');
+                    }
+                })
+                .catch(err => console.error(err));
+        });
     </script>
 @endsection

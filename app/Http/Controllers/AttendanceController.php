@@ -96,8 +96,8 @@ class AttendanceController extends Controller
     public function updateAttendance(Request $request, $id)
     {
         $request->validate([
-            'time_in'  => ['nullable', 'regex:/^\d{1,2}:\d{2}\s?(AM|PM)$/i'],
-            'time_out' => ['nullable', 'regex:/^\d{1,2}:\d{2}\s?(AM|PM)$/i'],
+            'time_in'  => ['nullable', 'regex:/^\d{2}:\d{2}(:\d{2})?$/'],
+            'time_out' => ['nullable', 'regex:/^\d{2}:\d{2}(:\d{2})?$/'],
         ]);
 
         $attendance = Attendance::findOrFail($id);

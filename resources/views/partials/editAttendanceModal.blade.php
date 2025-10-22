@@ -1,19 +1,22 @@
 <dialog id="editAttendanceModal" class="modal">
     <form id="editAttendanceForm" class="modal-box max-w-md p-6 rounded-xl shadow-lg bg-white">
+        @csrf
 
         <!-- Header -->
         <div class="flex justify-between items-center mb-4">
             <h5 class="text-xl font-bold text-blue-700 flex items-center gap-2">
-                <i class="bx bx-edit-alt text-lg"></i> Edit Attendance
+                <i class="bx bx-calendar-edit"></i> Edit / Add Attendance
             </h5>
             <button type="button" class="text-gray-500 hover:text-gray-700 hover:bg-gray-200 rounded-full p-1 transition"
-                onclick="editAttendanceModal.close()">
+                onclick="document.getElementById('editAttendanceModal').close()">
                 ✕
             </button>
         </div>
 
         <!-- Hidden ID -->
         <input type="hidden" id="edit_attendance_id" name="attendance_id">
+        <input type="hidden" id="edit_attendance_emp_id" name="emp_id">
+        <input type="hidden" id="edit_attendance_date" name="date">
 
         <!-- Time In -->
         <div class="mb-3">
@@ -29,17 +32,15 @@
                 class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
         </div>
 
-
         <!-- Actions -->
         <div class="flex justify-end gap-2 mt-4">
-            <button type="submit"
-                class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md px-4 py-2 transition">
-                <i class="bx bx-save"></i> Save Changes
-            </button>
             <button type="button"
-                class="flex items-center gap-2 border border-gray-300 rounded-md px-4 py-2 hover:bg-gray-100 transition"
-                onclick="editAttendanceModal.close()">
-                <i class="bx bx-x"></i> Cancel
+                class="border border-gray-300 rounded-md px-4 py-2 hover:bg-gray-100 transition"
+                onclick="document.getElementById('editAttendanceModal').close()">Cancel</button>
+
+            <button type="submit"
+                class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition">
+                Save Changes
             </button>
         </div>
     </form>

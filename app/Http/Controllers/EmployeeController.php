@@ -151,54 +151,41 @@ class EmployeeController extends Controller
     {
         $employee = Employee::with('user')->findOrFail($id);
 
-        // week paging: 0 = current week, 1 = previous week, etc.
-        $week = (int) $request->query('week', 0);
-        $startOfWeek = Carbon::now()->startOfWeek()->subWeeks($week);
-        $endOfWeek = Carbon::now()->endOfWeek()->subWeeks($week);
-
-        // determine first record date (attendance) or fallback to employee created_at
+        // determine first attendance date (attendance) or fallback to employee created_at
         $firstAttendanceDate = Attendance::where('emp_id', $employee->id)
             ->orderBy('date')
             ->value('date');
 
         if ($firstAttendanceDate) {
-            $firstRecord = Carbon::parse($firstAttendanceDate)->startOfDay();
+            $startDate = Carbon::parse($firstAttendanceDate)->startOfDay();
         } else {
-            // fallback: when employee was added (if created_at exists), otherwise startOfWeek
-            $firstRecord = $employee->created_at ? Carbon::parse($employee->created_at)->startOfDay() : $startOfWeek;
+            $startDate = $employee->created_at ? Carbon::parse($employee->created_at)->startOfDay() : Carbon::now()->startOfDay();
         }
 
-        // build full week range
-        $period = CarbonPeriod::create($startOfWeek->copy()->startOfDay(), $endOfWeek->copy()->startOfDay());
+        // end date = today (no future dates)
+        $endDate = Carbon::now()->startOfDay();
 
-        // convert to array of Carbon dates but filter out dates before first record
-        $weekDates = collect($period)
-            ->filter(function (Carbon $d) use ($firstRecord) {
-                return $d->gte($firstRecord);
-            })
-            ->values();
+        // guard: if start is after today, clamp to today
+        if ($startDate->gt($endDate)) {
+            $startDate = $endDate;
+        }
 
-        // load attendances for this week and key by date (Y-m-d)
+        // build date range from startDate to today (inclusive)
+        $period = CarbonPeriod::create($startDate, '1 day', $endDate);
+        $weekDates = collect($period)->values(); // reuse $weekDates variable used by the view
+
+        // load attendances for this date range and key by date (Y-m-d)
         $attendances = Attendance::where('emp_id', $employee->id)
-            ->whereBetween('date', [$startOfWeek->toDateString(), $endOfWeek->toDateString()])
+            ->whereBetween('date', [$startDate->toDateString(), $endDate->toDateString()])
             ->get()
             ->keyBy(function ($item) {
                 return Carbon::parse($item->date)->toDateString();
             });
 
-        // pagination flags as before
-        $firstAttendance = Attendance::where('emp_id', $employee->id)->orderBy('date')->first();
-        $canPrev = $firstAttendance && $startOfWeek->gt(Carbon::parse($firstAttendance->date));
-
-        return view('EmpAttendance', compact(
-            'employee',
-            'weekDates',
-            'attendances',
-            'week',
-            'canPrev',
-            'startOfWeek',
-            'endOfWeek'
-        ));
+        // pass start/end for header display
+        return view('EmpAttendance', compact('employee', 'weekDates', 'attendances'))
+            ->with('startDate', $startDate)
+            ->with('endDate', $endDate);
     }
 
 

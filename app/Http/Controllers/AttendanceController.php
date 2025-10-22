@@ -120,4 +120,36 @@ class AttendanceController extends Controller
             'data' => $attendance
         ]);
     }
+
+    /**
+     * Create attendance (admin add for missed date) — no password required
+     */
+    public function storeAttendance(Request $request)
+    {
+        $request->validate([
+            'emp_id'   => 'required|exists:employees,id',
+            'date'     => 'required|date|before_or_equal:today',
+            'time_in'  => ['nullable','regex:/^\d{2}:\d{2}(:\d{2})?$/'],
+            'time_out' => ['nullable','regex:/^\d{2}:\d{2}(:\d{2})?$/'],
+        ]);
+
+        // convert times to H:i:s
+        $timeIn = $request->time_in ? date('H:i:s', strtotime($request->time_in)) : null;
+        $timeOut = $request->time_out ? date('H:i:s', strtotime($request->time_out)) : null;
+
+        $attendance = Attendance::firstOrNew([
+            'emp_id' => $request->emp_id,
+            'date' => $request->date,
+        ]);
+
+        $attendance->time_in = $timeIn;
+        $attendance->time_out = $timeOut;
+        $attendance->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Attendance saved successfully',
+            'data' => $attendance
+        ]);
+    }
 }

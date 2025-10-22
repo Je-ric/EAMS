@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\SocialAuthController;
+use App\Http\Controllers\ExportController;
 
 Route::get('/', [EmployeeController::class, 'index'])->name('index');
 
@@ -35,3 +36,6 @@ Route::get('/auth/google/callback', [SocialAuthController::class, 'handleGoogleC
 //     session()->regenerateToken();
 //     return redirect()->route('index')->with('success', 'Logged out successfully.');
 // });
+
+Route::get('/employees/{id}/attendance/export', [ExportController::class, 'exportEmployee'])->name('employees.attendance.export');
+Route::get('/attendance/export/today', [ExportController::class, 'exportToday'])->name('attendance.export.today');

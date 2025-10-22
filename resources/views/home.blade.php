@@ -10,7 +10,7 @@
                     Employee Attendance
                 </h1>
                 <p class="text-gray-500 text-sm mt-1">
-                        \Carbon\Carbon::now('Asia/Manila')->format('F j, Y (l) • h:i A') 
+                    {{ \Carbon\Carbon::now('Asia/Manila')->format('F j, Y (l) • h:i A') }}
                 </p>
                 @auth
                     @if (Auth::user()->role === 'admin')    
@@ -28,6 +28,15 @@
                     <input type="text" id="searchInput" placeholder="Search here..."
                         class="flex-1 px-3 py-2 focus:outline-none">
                 </div>
+
+                @auth
+                    @if (Auth::user()->role === 'admin')
+                        <a href="{{ route('attendance.export.today') }}"
+                            class="ml-4 inline-flex items-center gap-2 px-3 py-1.5 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition">
+                            <i class="bx bx-download"></i> Export CSV
+                        </a>
+                    @endif
+                @endauth
 
                 @guest
                     <div>

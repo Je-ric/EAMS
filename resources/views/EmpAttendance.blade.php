@@ -23,6 +23,11 @@
                 Attendance: {{ \Carbon\Carbon::parse($startDate)->format('M d, Y') }} —
                 {{ \Carbon\Carbon::parse($endDate)->format('M d, Y') }}
             </h3>
+
+            <a href="{{ route('employees.attendance.export', $employee->id) }}"
+                class="ml-4 inline-flex items-center gap-2 px-3 py-1.5 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition">
+                <i class="bx bx-download"></i> Export CSV
+            </a>
         </div>
 
         <div class="overflow-x-auto">

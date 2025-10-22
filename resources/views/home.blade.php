@@ -26,12 +26,14 @@
                         class="flex-1 px-3 py-2 focus:outline-none">
                 </div>
 
-                <div>
-                    <button class="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition"
-                    onclick="registerEmployeeModal.showModal()">
-                        <i class='bx bx-user-plus'></i> Register as Employee
-                    </button>
-                </div>
+                @guest
+                    <div>
+                        <button class="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition"
+                        onclick="registerEmployeeModal.showModal()">
+                            <i class='bx bx-user-plus'></i> Register as Employee
+                        </button>
+                    </div>
+                @endguest
 
                 <!-- Admin Buttons -->
                 @auth
@@ -82,10 +84,16 @@
                     @forelse ($employees as $index => $employee)
                         <tr class="hover:bg-blue-50 transition-colors">
                             <td class="px-4 py-2">{{ $index + 1 }}</td>
-                            <td class="px-4 py-2">
-                                <img src="{{ $employee->emp_pic ? asset('storage/' . $employee->emp_pic) : 'https://via.placeholder.com/80x50' }}"
-                                    alt="Profile"
-                                    class="mx-auto rounded-full w-12 h-12 object-cover border border-gray-300">
+                            <td class="px-4 py-2 text-center">
+                                @if ($employee->emp_pic)
+                                    <img src="{{ asset('storage/' . $employee->emp_pic) }}"
+                                        alt="Profile"
+                                        class="mx-auto rounded-full w-12 h-12 object-cover border border-gray-300">
+                                @else
+                                    <div class="mx-auto flex items-center justify-center w-12 h-12 rounded-full bg-blue-600 text-white text-lg font-bold border border-gray-300">
+                                        {{ strtoupper(substr($employee->user->name ?? 'N', 0, 1)) }}
+                                    </div>
+                                @endif
                             </td>
                             <td class="px-4 py-2 font-semibold">{{ $employee->user->name ?? 'N/A' }}</td>
                             <td class="px-4 py-2 text-gray-600">{{ $employee->position }}</td>
@@ -167,7 +175,37 @@
             <button class="px-3 py-1.5 border rounded-lg hover:bg-gray-100 transition">Next</button>
         </div>
 
+          {{-- @if (session('showSetPasswordModal'))
+    <dialog id="setPasswordModal" class="modal" open>
+        <div class="modal-box">
+            <h3 class="font-bold text-lg mb-4">Set Your Employee Password</h3>
+
+            <form method="POST" action="{{ route('employee.setPassword') }}">
+                @csrf
+                <input type="hidden" name="employee_id" value="{{ Auth::user()->employee->id ?? '' }}">
+
+                <div class="form-control mb-3">
+                    <label class="label font-semibold">New Password</label>
+                    <input type="password" name="password" class="input input-bordered w-full" required>
+                </div>
+
+                <div class="form-control mb-3">
+                    <label class="label font-semibold">Confirm Password</label>
+                    <input type="password" name="password_confirmation" class="input input-bordered w-full" required>
+                </div>
+
+                <div class="modal-action">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                    <a href="{{ route('index') }}" class="btn">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </dialog>
+@endif --}}
+
+
     </div>
+
 
     @include('partials.passwordModal')
     @include('partials.updateEmpModal')

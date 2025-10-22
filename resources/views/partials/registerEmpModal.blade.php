@@ -26,7 +26,7 @@
 
         <!-- Social Login -->
         <div class="flex flex-col gap-2">
-            <a {{-- href="{{ route('auth.google.redirect') }}" --}}
+            <a href="{{ route('auth.google') }}"
                 class="flex items-center justify-center gap-2 bg-red-500 hover:bg-red-600 text-white rounded-md py-2 font-medium transition">
                 <i class='bx bxl-google text-lg'></i> Continue with Google
             </a>

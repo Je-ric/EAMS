@@ -10,6 +10,8 @@ class Employee extends Model
         'user_id',
         'position',
         'emp_pic',
+        'password',
+        'login_provider',
     ];
 
     public function user()

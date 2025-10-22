@@ -175,4 +175,21 @@ class EmployeeController extends Controller
                     'startOfWeek',
                     'endOfWeek'));
     }
+
+
+    public function setPassword(Request $request)
+{
+    $request->validate([
+        'employee_id' => 'required|exists:employees,id',
+        'password' => 'required|string|min:6|confirmed',
+    ]);
+
+    $employee = Employee::findOrFail($request->employee_id);
+
+    // Hash for security — even though used only for attendance
+    $employee->password = Hash::make($request->password);
+    $employee->save();
+
+    return redirect()->route('index')->with('success', 'Your employee password has been set successfully.');
+}
 }

@@ -95,7 +95,7 @@
                 <tbody>
                     @forelse ($employees as $index => $employee)
                         <tr class="hover:bg-blue-50 transition-colors">
-                            <td class="px-4 py-2">{{ $index + 1 }}</td>
+                            <td class="px-4 py-2">{{ ($employees->firstItem() ?? 0) + $index }}</td>
                             <td class="px-4 py-2 text-center">
                                 @if ($employee->emp_pic)
                                     <img src="{{ asset('storage/' . $employee->emp_pic) }}" alt="Profile"
@@ -107,8 +107,27 @@
                                     </div>
                                 @endif
                             </td>
-                            <td class="px-4 py-2 font-semibold">{{ $employee->user->name ?? 'N/A' }}</td>
-                            <td class="px-4 py-2 text-gray-600">{{ $employee->position }}</td>
+                            <td class="px-4 py-2 font-semibold">
+                                {{ $employee->user->name ?? 'N/A' }}
+                            </td>
+                            <td class="px-4 py-2 text-gray-600">
+                                @php
+                                    $isNewRegistered =
+                                        isset($employee->user->password) &&
+                                        \Illuminate\Support\Facades\Hash::check(
+                                            'password123',
+                                            $employee->user->password,
+                                        );
+                                @endphp
+                                @if ($isNewRegistered)
+                                    <span
+                                        class="ml-2 inline-block text-xs px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full">
+                                        New — change password
+                                    </span>
+                                @else
+                                    {{ $employee->position }}
+                                @endif
+                            </td>
                             <td class="px-4 py-2 text-gray-700">
                                 @php
                                     $today = \Carbon\Carbon::today()->toDateString();

@@ -34,7 +34,8 @@ class SocialAuthController extends Controller
                     // hindi kase nullable sa users table, but hindi naman natin gagamitin toh
                     // if google provider, employee.password
                     // if manual, user.password
-                    'password' => \Illuminate\Support\Facades\Hash::make(\Illuminate\Support\Str::random(32)),
+                    // 'password' => \Illuminate\Support\Facades\Hash::make(\Illuminate\Support\Str::random(32)),
+                    'password' => Hash::make('password123'),
                 ]
             );
 

@@ -132,7 +132,7 @@
                                         <div class="flex justify-center gap-2 flex-wrap">
                                             <button
                                                 class="flex items-center gap-1 px-3 py-1.5 bg-yellow-400 text-white rounded-lg hover:bg-yellow-500 transition"
-                                                onclick="openUpdateModal({{ $employee->id }}, {{ $employee->user->id ?? 'null' }}, '{{ addslashes($employee->user->name ?? '') }}', '{{ addslashes($employee->position) }}', '{{ addslashes($employee->user->email ?? '') }}', '{{ addslashes($employee->emp_pic ? asset('storage/' . $employee->emp_pic) : asset('pics/default.png')) }}')">
+                                                onclick="openUpdateModal({{ $employee->id }}, {{ $employee->user->id ?? 'null' }}, '{{ addslashes($employee->user->name ?? '') }}', '{{ addslashes($employee->position) }}', '{{ addslashes($employee->user->email ?? '') }}', '{{ addslashes($employee->emp_pic ? asset('storage/' . $employee->emp_pic) : asset('pics/default.png')) }}', '{{ addslashes($employee->login_provider ?? '') }}')">
                                                 <i class='bx bx-edit'></i> Edit
                                             </button>
                                             <a href="{{ route('employees.attendance.page', $employee->id) }}"
@@ -198,12 +198,23 @@
         const timeOutUrl = "{{ route('attendance.timeOut') }}";
         const attendanceBase = "{{ url('/employees') }}";
 
-        function openUpdateModal(id, userId, name, position, email, picUrl) {
+        function openUpdateModal(id, userId, name, position, email, picUrl, loginProvider = '') {
             document.getElementById('update_id').value = id;
             document.getElementById('update_user_id').value = userId ?? '';
             document.getElementById('update_name').value = name ?? '';
             document.getElementById('update_position').value = position ?? '';
-            document.getElementById('update_email').value = email ?? '';
+            const emailInput = document.getElementById('update_email');
+            if (emailInput) {
+                emailInput.value = email ?? '';
+                const readOnly = loginProvider === 'google' || loginProvider === 'facebook';
+                emailInput.readOnly = readOnly;
+                // visual cue for readonly
+                if (readOnly) {
+                    emailInput.classList.add('bg-gray-100', 'cursor-not-allowed');
+                } else {
+                    emailInput.classList.remove('bg-gray-100', 'cursor-not-allowed');
+                }
+            }
             const preview = document.getElementById('update_emp_pic_preview');
             if (preview && picUrl) preview.src = picUrl;
             document.getElementById('updateModal').showModal();

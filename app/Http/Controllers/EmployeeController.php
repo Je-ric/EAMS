@@ -15,10 +15,10 @@ class EmployeeController extends Controller
 {
     public function index()
     {
-        $employees = Employee::with(['user', 'attendances'])->get();
+        $employees = Employee::with(['user', 'attendances'])->paginate(perPage: 5);
         $today = now()->toDateString();
 
-        $employees = $employees->map(function ($employee) use ($today) {
+        $employees->getCollection()->transform(function ($employee) use ($today) {
             $todayAttendance = $employee->attendances->firstWhere('date', $today);
             $employee->timeInDone = $todayAttendance && $todayAttendance->time_in ? true : false;
             $employee->timeOutDone = $todayAttendance && $todayAttendance->time_out ? true : false;
@@ -195,13 +195,13 @@ class EmployeeController extends Controller
     //         'employee_id' => 'required|exists:employees,id',
     //         'password' => 'required|string|min:6|confirmed',
     //     ]);
-
+    //
     //     $employee = Employee::findOrFail($request->employee_id);
-
+    //
     //     // Hash for security — even though used only for attendance
     //     $employee->password = Hash::make($request->password);
     //     $employee->save();
-
+    //
     //     return redirect()->route('index')->with('success', 'Your employee password has been set successfully.');
     // }
 }

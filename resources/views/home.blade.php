@@ -13,7 +13,7 @@
                     {{ \Carbon\Carbon::now('Asia/Manila')->format('F j, Y (l) • h:i A') }}
                 </p>
                 @auth
-                    @if (Auth::user()->role === 'admin')    
+                    @if (Auth::user()->role === 'admin')
                         <p class="text-gray-600 text-sm mt-1">
                             Logged in as: <span class="font-semibold text-blue-600">{{ Auth::user()->name }}</span>
                         </p>
@@ -40,21 +40,21 @@
 
                 @guest
                     <div>
-                        <button class="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition"
-                        onclick="registerEmployeeModal.showModal()">
+                        <button
+                            class="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition"
+                            onclick="registerEmployeeModal.showModal()">
                             <i class='bx bx-user-plus'></i> Register as Employee
                         </button>
                     </div>
                 @endguest
 
-                <!-- Admin Buttons -->
                 @auth
                     @if (Auth::user()->role === 'admin')
-                        <button
+                        {{-- <button
                             class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
                             onclick="attendanceSummaryModal.showModal()">
                             <i class='bx bx-clipboard'></i> Summary
-                        </button>
+                        </button> --}}
                         <button
                             class="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition"
                             onclick="addModal.showModal()">
@@ -98,11 +98,11 @@
                             <td class="px-4 py-2">{{ $index + 1 }}</td>
                             <td class="px-4 py-2 text-center">
                                 @if ($employee->emp_pic)
-                                    <img src="{{ asset('storage/' . $employee->emp_pic) }}"
-                                        alt="Profile"
+                                    <img src="{{ asset('storage/' . $employee->emp_pic) }}" alt="Profile"
                                         class="mx-auto rounded-full w-12 h-12 object-cover border border-gray-300">
                                 @else
-                                    <div class="mx-auto flex items-center justify-center w-12 h-12 rounded-full bg-blue-600 text-white text-lg font-bold border border-gray-300">
+                                    <div
+                                        class="mx-auto flex items-center justify-center w-12 h-12 rounded-full bg-blue-600 text-white text-lg font-bold border border-gray-300">
                                         {{ strtoupper(substr($employee->user->name ?? 'N', 0, 1)) }}
                                     </div>
                                 @endif
@@ -180,40 +180,7 @@
             </table>
         </div>
 
-        <!-- Pagination -->
-        <div class="flex justify-between items-center mt-6">
-            <button class="px-3 py-1.5 border rounded-lg hover:bg-gray-100 transition">Previous</button>
-            <span class="text-gray-700 font-medium">Page 1 of 1</span>
-            <button class="px-3 py-1.5 border rounded-lg hover:bg-gray-100 transition">Next</button>
-        </div>
-
-          {{-- @if (session('showSetPasswordModal'))
-    <dialog id="setPasswordModal" class="modal" open>
-        <div class="modal-box">
-            <h3 class="font-bold text-lg mb-4">Set Your Employee Password</h3>
-
-            <form method="POST" action="{{ route('employee.setPassword') }}">
-                @csrf
-                <input type="hidden" name="employee_id" value="{{ Auth::user()->employee->id ?? '' }}">
-
-                <div class="form-control mb-3">
-                    <label class="label font-semibold">New Password</label>
-                    <input type="password" name="password" class="input input-bordered w-full" required>
-                </div>
-
-                <div class="form-control mb-3">
-                    <label class="label font-semibold">Confirm Password</label>
-                    <input type="password" name="password_confirmation" class="input input-bordered w-full" required>
-                </div>
-
-                <div class="modal-action">
-                    <button type="submit" class="btn btn-primary">Save</button>
-                    <a href="{{ route('index') }}" class="btn">Cancel</a>
-                </div>
-            </form>
-        </div>
-    </dialog>
-@endif --}}
+        {{ $employees->links('vendor.pagination.custom') }}
 
 
     </div>

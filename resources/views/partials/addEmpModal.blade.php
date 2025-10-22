@@ -1,6 +1,6 @@
 <!-- Add Employee Modal -->
 <dialog id="addModal" class="modal">
-    <div class="modal-box max-w-lg rounded-xl shadow-lg p-6 bg-white">
+    <div class="modal-box max-w-xl rounded-xl shadow-lg p-6 bg-white">
 
         <!-- Header -->
         <div class="flex justify-between items-center mb-6 border-b pb-3">

@@ -1,6 +1,6 @@
 <!-- Update Employee Modal -->
 <dialog id="updateModal" class="modal">
-    <div class="modal-box max-w-4xl p-6 rounded-xl shadow-lg bg-white">
+    <div class="modal-box max-w-xl p-6 rounded-xl shadow-lg bg-white">
 
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-2xl font-bold text-blue-700 flex items-center gap-2">
@@ -60,10 +60,10 @@
             </div>
         </form>
 
-        <div class="modal-action mt-6">
+        <div class="mt-4 pt-3 border-t">
             <form method="dialog">
                 <button
-                    class="w-full border border-gray-300 rounded-md px-4 py-2 hover:bg-gray-100 transition">Close</button>
+                    class="w-full rounded-md border border-gray-300 px-4 py-2 hover:bg-gray-100 transition">Close</button>
             </form>
         </div>
     </div>

@@ -34,25 +34,24 @@ class SocialAuthController extends Controller
                     'email_verified_at' => now(),
                     'role' => 'employee',
                     // give a random hashed password so DB NOT NULL constraints won't fail
+                    // hindi kase nullable sa users table, but hindi naman natin gagamitin toh
+                    // if google provider, employee.password
+                    // if manual, user.password
                     'password' => \Illuminate\Support\Facades\Hash::make(\Illuminate\Support\Str::random(32)),
                 ]
             );
 
-            // Create employee profile if it doesn’t exist
-            $employee = Employee::firstOrCreate(
+            $employee = Employee::updateOrCreate(
                 ['user_id' => $user->id],
                 [
                     'position' => 'Employee',
                     'login_provider' => 'google',
                     'emp_pic' => $googleUser->getAvatar(),
+                    'password' => null,
                 ]
             );
 
-            // Login user
-            // Auth::login($user);
 
-            // Redirect to your main page with a flag to show password modal
-            // return redirect()->route('index')->with('showSetPasswordModal', true);
             return redirect()->route('index');
 
         } catch (\Exception $e) {

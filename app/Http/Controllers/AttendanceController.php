@@ -96,9 +96,6 @@ class AttendanceController extends Controller
         return back()->with('success', 'Time-out recorded successfully.');
     }
 
-    /**
-     * Update attendance (accepts 12-hour input, stores 24-hour)
-     */
     public function updateAttendance(Request $request, $id)
     {
         $request->validate([

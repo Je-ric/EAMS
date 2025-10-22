@@ -103,9 +103,6 @@ class EmployeeController extends Controller
         return back()->with('success', 'Employee updated successfully.');
     }
 
-    /**
-     * Delete an employee (and linked user).
-     */
     public function destroy($id)
     {
         $employee = Employee::findOrFail($id);
@@ -189,19 +186,4 @@ class EmployeeController extends Controller
     }
 
 
-    // public function setPassword(Request $request)
-    // {
-    //     $request->validate([
-    //         'employee_id' => 'required|exists:employees,id',
-    //         'password' => 'required|string|min:6|confirmed',
-    //     ]);
-    //
-    //     $employee = Employee::findOrFail($request->employee_id);
-    //
-    //     // Hash for security — even though used only for attendance
-    //     $employee->password = Hash::make($request->password);
-    //     $employee->save();
-    //
-    //     return redirect()->route('index')->with('success', 'Your employee password has been set successfully.');
-    // }
 }

@@ -1,7 +1,6 @@
-<!-- Attendance Summary Modal -->
 <dialog id="attendanceSummaryModal" class="modal">
     <div class="modal-box max-w-5xl">
-        <!-- Header -->
+
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
                 <i class="fas fa-clipboard-list text-blue-600"></i>
@@ -12,7 +11,6 @@
             </form>
         </div>
 
-        <!-- Filters -->
         <div class="flex flex-col md:flex-row justify-between gap-3 mb-5">
             <div class="flex flex-wrap items-center gap-3">
                 <label class="text-gray-700 font-medium">From:</label>
@@ -32,7 +30,6 @@
             </div>
         </div>
 
-        <!-- Table -->
         <div class="overflow-x-auto rounded-lg border border-gray-200">
             <table class="table table-zebra w-full text-center">
                 <thead class="bg-gradient-to-r from-blue-600 to-blue-500 text-white">
@@ -61,14 +58,12 @@
             </table>
         </div>
 
-        <!-- Pagination -->
         <div class="flex justify-between items-center mt-5">
             <button class="btn btn-outline btn-sm">Previous</button>
             <span class="text-gray-700 font-medium">Page 1 of 1</span>
             <button class="btn btn-outline btn-sm">Next</button>
         </div>
 
-        <!-- Footer (optional close) -->
         <div class="modal-action">
             <form method="dialog">
                 <button class="btn btn-neutral">Close</button>
@@ -76,7 +71,6 @@
         </div>
     </div>
 
-    <!-- Modal backdrop -->
     <form method="dialog" class="modal-backdrop">
         <button>close</button>
     </form>

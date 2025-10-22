@@ -2,7 +2,7 @@
     <form {{-- method="POST"
   action="{{ route('employee.register') }}" --}} class="modal-box max-w-md bg-white p-6 rounded-xl shadow-lg">
         @csrf
-        <!-- Header -->
+
         <div class="flex justify-between items-center mb-4">
             <h3 class="text-2xl font-bold text-blue-700 flex items-center gap-2">
                 <i class='bx bx-user-plus text-xl'></i> Register as Employee
@@ -11,20 +11,17 @@
                 onclick="registerEmployeeModal.close()">✕</button>
         </div>
 
-        <!-- Submit -->
         <button type="submit"
             class="w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md px-4 py-2 transition">
             Register
         </button>
 
-        <!-- Divider -->
         <div class="flex items-center my-4">
             <div class="flex-grow border-t border-gray-300"></div>
             <span class="mx-2 text-gray-500 text-sm">or</span>
             <div class="flex-grow border-t border-gray-300"></div>
         </div>
 
-        <!-- Social Login -->
         <div class="flex flex-col gap-2">
             <a href="{{ route('auth.google') }}"
                 class="flex items-center justify-center gap-2 bg-red-500 hover:bg-red-600 text-white rounded-md py-2 font-medium transition">

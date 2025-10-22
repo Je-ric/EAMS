@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
+use Carbon\CarbonPeriod;
 
 class EmployeeController extends Controller
 {
@@ -61,9 +62,6 @@ class EmployeeController extends Controller
         return back()->with('success', 'Employee added successfully.');
     }
 
-    /**
-     * Update an existing employee.
-     */
     public function update(Request $request)
     {
         $request->validate([
@@ -153,43 +151,70 @@ class EmployeeController extends Controller
     {
         $employee = Employee::with('user')->findOrFail($id);
 
-        // Get week start (Monday) and end (Sunday) for current page
-        $week = $request->query('week', 0); // 0 = current week, 1 = previous, etc.
-        $startOfWeek = now()->startOfWeek()->subWeeks($week);
-        $endOfWeek = now()->endOfWeek()->subWeeks($week);
+        // week paging: 0 = current week, 1 = previous week, etc.
+        $week = (int) $request->query('week', 0);
+        $startOfWeek = Carbon::now()->startOfWeek()->subWeeks($week);
+        $endOfWeek = Carbon::now()->endOfWeek()->subWeeks($week);
 
+        // determine first record date (attendance) or fallback to employee created_at
+        $firstAttendanceDate = Attendance::where('emp_id', $employee->id)
+            ->orderBy('date')
+            ->value('date');
+
+        if ($firstAttendanceDate) {
+            $firstRecord = Carbon::parse($firstAttendanceDate)->startOfDay();
+        } else {
+            // fallback: when employee was added (if created_at exists), otherwise startOfWeek
+            $firstRecord = $employee->created_at ? Carbon::parse($employee->created_at)->startOfDay() : $startOfWeek;
+        }
+
+        // build full week range
+        $period = CarbonPeriod::create($startOfWeek->copy()->startOfDay(), $endOfWeek->copy()->startOfDay());
+
+        // convert to array of Carbon dates but filter out dates before first record
+        $weekDates = collect($period)
+            ->filter(function (Carbon $d) use ($firstRecord) {
+                return $d->gte($firstRecord);
+            })
+            ->values();
+
+        // load attendances for this week and key by date (Y-m-d)
         $attendances = Attendance::where('emp_id', $employee->id)
             ->whereBetween('date', [$startOfWeek->toDateString(), $endOfWeek->toDateString()])
-            ->orderBy('date', 'desc')
-            ->get();
+            ->get()
+            ->keyBy(function ($item) {
+                return Carbon::parse($item->date)->toDateString();
+            });
 
-        // For pagination controls
+        // pagination flags as before
         $firstAttendance = Attendance::where('emp_id', $employee->id)->orderBy('date')->first();
-        $canPrev = $firstAttendance && $startOfWeek->gt(\Carbon\Carbon::parse($firstAttendance->date));
+        $canPrev = $firstAttendance && $startOfWeek->gt(Carbon::parse($firstAttendance->date));
 
         return view('EmpAttendance', compact(
-                    'employee',
-                    'attendances',
-                    'week',
-                    'canPrev',
-                    'startOfWeek',
-                    'endOfWeek'));
+            'employee',
+            'weekDates',
+            'attendances',
+            'week',
+            'canPrev',
+            'startOfWeek',
+            'endOfWeek'
+        ));
     }
 
 
-    public function setPassword(Request $request)
-{
-    $request->validate([
-        'employee_id' => 'required|exists:employees,id',
-        'password' => 'required|string|min:6|confirmed',
-    ]);
+    // public function setPassword(Request $request)
+    // {
+    //     $request->validate([
+    //         'employee_id' => 'required|exists:employees,id',
+    //         'password' => 'required|string|min:6|confirmed',
+    //     ]);
 
-    $employee = Employee::findOrFail($request->employee_id);
+    //     $employee = Employee::findOrFail($request->employee_id);
 
-    // Hash for security — even though used only for attendance
-    $employee->password = Hash::make($request->password);
-    $employee->save();
+    //     // Hash for security — even though used only for attendance
+    //     $employee->password = Hash::make($request->password);
+    //     $employee->save();
 
-    return redirect()->route('index')->with('success', 'Your employee password has been set successfully.');
-}
+    //     return redirect()->route('index')->with('success', 'Your employee password has been set successfully.');
+    // }
 }

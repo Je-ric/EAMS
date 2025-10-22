@@ -9,8 +9,11 @@
                 <h1 class="text-4xl font-extrabold text-gray-900 tracking-tight">
                     Employee Attendance
                 </h1>
+                <p class="text-gray-500 text-sm mt-1">
+                        \Carbon\Carbon::now('Asia/Manila')->format('F j, Y (l) • h:i A') 
+                </p>
                 @auth
-                    @if (Auth::user()->role === 'admin')
+                    @if (Auth::user()->role === 'admin')    
                         <p class="text-gray-600 text-sm mt-1">
                             Logged in as: <span class="font-semibold text-blue-600">{{ Auth::user()->name }}</span>
                         </p>

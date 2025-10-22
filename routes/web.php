@@ -25,8 +25,8 @@ Route::put('/attendance/{id}', [AttendanceController::class, 'updateAttendance']
 Route::get('/auth/google', [SocialAuthController::class, 'redirectToGoogle'])->name('auth.google');
 Route::get('/auth/google/callback', [SocialAuthController::class, 'handleGoogleCallback'])->name('auth.google.callback');
 
-Route::post('/employee/set-password', [EmployeeController::class, 'setPassword'])
-    ->name('employee.setPassword');
+// Route::post('/employee/set-password', [EmployeeController::class, 'setPassword'])
+//     ->name('employee.setPassword');
 
 //Route::get('/force-logout', function () {
 //     Auth::logout();

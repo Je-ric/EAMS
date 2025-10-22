@@ -12,7 +12,6 @@ class SocialAuthController extends Controller
     // Redirect to Google
     public function redirectToGoogle()
     {
-        // Add ->stateless() here too to avoid "state mismatch" issues
         return Socialite::driver('google')
             ->stateless()
             ->with(['prompt' => 'select_account'])
@@ -23,10 +22,8 @@ class SocialAuthController extends Controller
     public function handleGoogleCallback()
     {
         try {
-            // Always use stateless for local testing
             $googleUser = Socialite::driver('google')->stateless()->user();
 
-            // Create or update user record
             $user = User::updateOrCreate(
                 ['email' => $googleUser->getEmail()],
                 [

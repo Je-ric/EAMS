@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('page-content')
-    <div class="max-w-7xl mx-auto bg-white rounded-xl shadow-lg p-8">
+    <div class="max-w-5xl mx-auto bg-white rounded-xl shadow-lg p-8">
         <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
             <div class="flex items-center gap-4">
                 <img src="{{ $employee->emp_pic ? asset('storage/' . $employee->emp_pic) : 'https://via.placeholder.com/100' }}"
@@ -39,31 +39,40 @@
             <table class="min-w-full border border-gray-300 rounded-lg">
                 <thead class="bg-blue-100">
                     <tr>
-                        <th class="px-3 py-2 border">Date</th>
-                        <th class="px-3 py-2 border">Time In / Time Out</th>
-                        <th class="px-3 py-2 border">Actions</th>
+                        <th class="px-3 py-2 border text-left">Date</th>
+                        <th class="px-3 py-2 border text-left">Time In / Time Out</th>
+                        <th class="px-3 py-2 border text-left">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse($attendances as $a)
-                        <tr id="attendance-row-{{ $a->id }}">
-                            <td class="px-3 py-2 border">{{ \Carbon\Carbon::parse($a->date)->format('D, M d, Y') }}</td>
+                    @forelse($weekDates as $date)
+                        @php
+                            $key = $date->toDateString();
+                            $a = $attendances->get($key);
+                        @endphp
+
+                        <tr id="attendance-row-{{ $a->id ?? 'date'.$date->format('Ymd') }}">
+                            <td class="px-3 py-2 border">{{ $date->format('D, M d, Y') }}</td>
                             <td class="px-3 py-2 border attendance-times">
-                                {{ $a->time_in ? \Carbon\Carbon::parse($a->time_in)->format('h:i A') : '-' }}
+                                {{ $a ? (\Carbon\Carbon::parse($a->time_in)->format('h:i A') ?? '-') : '-' }}
                                 -
-                                {{ $a->time_out ? \Carbon\Carbon::parse($a->time_out)->format('h:i A') : 'No record yet' }}
+                                {{ $a ? (\Carbon\Carbon::parse($a->time_out)->format('h:i A') ?? 'No record yet') : 'No record' }}
                             </td>
                             <td class="px-3 py-2 border">
-                                <button
-                                    class="flex items-center gap-1 px-3 py-1.5 bg-yellow-500 text-white rounded-lg hover:bg-yellow-500 transition"
-                                    onclick="openEditAttendance({{ $a->id }}, '{{ $a->time_in ?? '' }}', '{{ $a->time_out ?? '' }}', '{{ $a->date }}')">
-                                    <i class="bx bx-edit"></i> Edit Attendance
-                                </button>
+                                @if($a)
+                                    <button
+                                        class="flex items-center gap-1 px-3 py-1.5 bg-yellow-500 text-white rounded-lg hover:bg-yellow-500 transition"
+                                        onclick="openEditAttendance({{ $a->id }}, '{{ $a->time_in ?? '' }}', '{{ $a->time_out ?? '' }}', '{{ $a->date }}')">
+                                        <i class="bx bx-edit"></i> Edit Attendance
+                                    </button>
+                                @else
+                                    <span class="text-gray-500">No record</span>
+                                @endif
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="3" class="text-gray-400 py-4">No attendance records for this week.</td>
+                            <td colspan="3" class="text-gray-400 py-4">No attendance dates to display.</td>
                         </tr>
                     @endforelse
                 </tbody>

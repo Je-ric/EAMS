@@ -8,3 +8,4 @@ php artisan make:controller AuthController
 php artisan make:controller EmployeeController
 php artisan make:migration update_employees_table_remove_email_fullname
 php artisan make:controller AttendanceController
+composer require laravel/socialite

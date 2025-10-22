@@ -26,6 +26,13 @@
                         class="flex-1 px-3 py-2 focus:outline-none">
                 </div>
 
+                <div>
+                    <button class="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition"
+                    onclick="registerEmployeeModal.showModal()">
+                        <i class='bx bx-user-plus'></i> Register as Employee
+                    </button>
+                </div>
+
                 <!-- Admin Buttons -->
                 @auth
                     @if (Auth::user()->role === 'admin')
@@ -167,6 +174,7 @@
     @include('partials.adminModal')
     @include('partials.addEmpModal')
     @include('partials.viewAttendanceSummary')
+    @include('partials.registerEmpModal')
 
     <script>
         const timeInUrl = "{{ route('attendance.timeIn') }}";

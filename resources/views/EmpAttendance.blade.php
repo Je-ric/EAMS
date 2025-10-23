@@ -61,7 +61,6 @@
                                         <i class="bx bx-edit"></i> Edit Attendance
                                     </button>
                                 @else
-                                    <!-- Show Add button for missing date -->
                                     <button
                                         class="flex items-center gap-1 px-3 py-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
                                         onclick="openEditAttendance(null, '', '', '{{ $date->toDateString() }}')">

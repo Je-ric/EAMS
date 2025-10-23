@@ -3,7 +3,6 @@
 @section('page-content')
     <div class="max-w-7xl mx-auto bg-white rounded-xl shadow-lg p-8">
 
-        <!-- Header -->
         <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
             <div>
                 <h1 class="text-4xl font-extrabold text-gray-900 tracking-tight">
@@ -22,7 +21,7 @@
             </div>
 
             <div class="flex gap-3 items-center w-full md:w-auto">
-                <!-- Search -->
+
                 <div class="flex items-center border rounded-lg overflow-hidden">
                     <button class="px-3 py-2 text-gray-500 hover:bg-gray-100 transition"><i class='bx bx-search'></i></button>
                     <input type="text" id="searchInput" placeholder="Search here..."
@@ -79,7 +78,6 @@
             </div>
         </div>
 
-        <!-- Employee Table -->
         <div class="overflow-x-auto">
             <table class="w-full text-center border border-gray-200 rounded-lg table-auto">
                 <thead class="bg-blue-600 text-white uppercase">

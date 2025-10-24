@@ -6,10 +6,10 @@ use App\Models\User;
 use App\Models\Employee;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
+use Illuminate\Support\Facades\Hash;
 
 class SocialAuthController extends Controller
 {
-    // Redirect to Google
     public function redirectToGoogle()
     {
         return Socialite::driver('google')
@@ -18,7 +18,6 @@ class SocialAuthController extends Controller
             ->redirect();
     }
 
-    // Handle callback from Google
     public function handleGoogleCallback()
     {
         try {
@@ -45,15 +44,49 @@ class SocialAuthController extends Controller
                     'position' => 'Employee',
                     'login_provider' => 'google',
                     'emp_pic' => $googleUser->getAvatar(),
-                    'password' => null,
                 ]
             );
 
 
             return redirect()->route('index');
-
         } catch (\Exception $e) {
             return redirect()->route('index')->with('error', 'Google login failed: ' . $e->getMessage());
+        }
+    }
+
+
+    public function redirectToFacebook()
+    {
+        return Socialite::driver('facebook')->redirect();
+    }
+
+    public function handleFacebookCallback()
+    {
+        try {
+            $facebookUser = Socialite::driver('facebook')->stateless()->user();
+
+            $user = User::updateOrCreate(
+                ['email' => $facebookUser->getEmail()],
+                [
+                    'name' => $facebookUser->getName(),
+                    'email_verified_at' => now(),
+                    'role' => 'employee',
+                    'password' => \Illuminate\Support\Facades\Hash::make('password123'),
+                ]
+            );
+
+            $employee = Employee::firstOrCreate(
+                ['user_id' => $user->id],
+                [
+                    'position' => 'Employee',
+                    'login_provider' => 'facebook',
+                    'emp_pic' => $facebookUser->getAvatar(),
+                ]
+            );
+
+            return redirect()->route('index')->with('showSetPasswordModal', true);
+        } catch (\Exception $e) {
+            return redirect()->route('index')->with('error', 'Facebook login failed: ' . $e->getMessage());
         }
     }
 }

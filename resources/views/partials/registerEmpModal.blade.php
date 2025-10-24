@@ -27,7 +27,7 @@
                 class="flex items-center justify-center gap-2 bg-red-500 hover:bg-red-600 text-white rounded-md py-2 font-medium transition">
                 <i class='bx bxl-google text-lg'></i> Continue with Google
             </a>
-            <a {{-- href="{{ route('auth.facebook.redirect') }}" --}}
+            <a href="{{ route('auth.facebook') }}"
                 class="flex items-center justify-center gap-2 bg-blue-700 hover:bg-blue-800 text-white rounded-md py-2 font-medium transition">
                 <i class='bx bxl-facebook-circle text-lg'></i> Continue with Facebook
             </a>

@@ -27,6 +27,9 @@ Route::post('/attendance', [AttendanceController::class, 'storeAttendance'])->na
 Route::get('/auth/google', [SocialAuthController::class, 'redirectToGoogle'])->name('auth.google');
 Route::get('/auth/google/callback', [SocialAuthController::class, 'handleGoogleCallback'])->name('auth.google.callback');
 
+Route::get('/auth/facebook', [SocialAuthController::class, 'redirectToFacebook'])->name('auth.facebook');
+Route::get('/auth/facebook/callback', [SocialAuthController::class, 'handleFacebookCallback'])->name('auth.facebook.callback');
+
 // Route::post('/employee/set-password', [EmployeeController::class, 'setPassword'])
 //     ->name('employee.setPassword');
 

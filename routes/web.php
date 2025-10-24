@@ -16,6 +16,8 @@ Route::post('/employees', [EmployeeController::class, 'store'])->name('employees
 Route::put('/employees/update', [EmployeeController::class, 'update'])->name('employees.update');
 Route::delete('/employees/{id}', [EmployeeController::class, 'destroy'])->name('employees.destroy');
 Route::get('/employees/{id}/attendance-page', [EmployeeController::class, 'attendancePage'])->name('employees.attendance.page');
+Route::get('/employees/search', [EmployeeController::class, 'search'])->name('employees.search');
+
 
 Route::post('/attendance/time-in', [AttendanceController::class, 'timeIn'])->name('attendance.timeIn');
 Route::post('/attendance/time-out', [AttendanceController::class, 'timeOut'])->name('attendance.timeOut');

@@ -246,5 +246,31 @@
             form.action = actionType === 'time-out' ? timeOutUrl : timeInUrl;
             passwordDialog.showModal();
         }
+
+
+        $(document).ready(function() {
+            $('#searchInput').on('keyup', function() {
+                const query = $(this).val();
+
+                $.ajax({
+                    url: "{{ route('employees.search') }}",
+                    method: 'GET',
+                    data: { query: query },
+                    beforeSend: function() {
+                        $('tbody').html('<tr><td colspan="6" class="py-4 text-gray-400">Searching...</td></tr>');
+                    },
+                    success: function(res) {
+                        $('tbody').html(res.html);
+                        $('.pagination').html(res.pagination);
+                    },
+                    error: function() {
+                        $('tbody').html('<tr><td colspan="6" class="py-4 text-red-500">Failed to fetch results.</td></tr>');
+                    }
+                });
+            });
+        });
+
     </script>
+
+    
 @endsection

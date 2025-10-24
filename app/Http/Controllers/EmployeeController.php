@@ -177,6 +177,33 @@ class EmployeeController extends Controller
             ->with('startDate', $startDate)
             ->with('endDate', $endDate);
     }
+public function search(Request $request)
+{
+    $query = $request->get('query', '');
+
+    $employees = Employee::with(['user', 'attendances'])
+        ->whereHas('user', function ($q) use ($query) {
+            $q->where('name', 'like', "%{$query}%")
+              ->orWhere('email', 'like', "%{$query}%");
+        })
+        ->orWhere('position', 'like', "%{$query}%")
+        ->paginate(5);
+
+    $today = now()->toDateString();
+
+    $employees->getCollection()->transform(function ($employee) use ($today) {
+        $todayAttendance = $employee->attendances->firstWhere('date', $today);
+        $employee->timeInDone = $todayAttendance && $todayAttendance->time_in ? true : false;
+        $employee->timeOutDone = $todayAttendance && $todayAttendance->time_out ? true : false;
+        return $employee;
+    });
+
+    // Return partial view (for table body)
+    return response()->json([
+        'html' => view('partials.employeeTableRows', compact('employees'))->render(),
+        'pagination' => view('vendor.pagination.custom', ['paginator' => $employees])->render()
+    ]);
+}
 
 
 }

@@ -1,6 +1,6 @@
 <dialog id="registerEmployeeModal" class="modal">
     <form {{-- method="POST"
-  action="{{ route('employee.register') }}" --}} class="modal-box max-w-md bg-white p-6 rounded-xl shadow-lg">
+        action="{{ route('employee.register') }}" --}} class="modal-box max-w-md bg-white p-6 rounded-xl shadow-lg">
         @csrf
 
         <div class="flex justify-between items-center mb-4">

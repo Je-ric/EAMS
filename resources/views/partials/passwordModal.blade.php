@@ -98,7 +98,8 @@
                             row.find('button:contains("Time Out")').prop('disabled', true);
                         }
                     } else {
-                        alert('Attendance recorded successfully!');
+                        alert('Wrong Password!');
+                        passwordInput.val('');
                     }
                 },
                 error: function(xhr) {

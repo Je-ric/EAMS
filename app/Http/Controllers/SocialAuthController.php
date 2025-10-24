@@ -10,6 +10,11 @@ use Illuminate\Support\Facades\Hash;
 
 class SocialAuthController extends Controller
 {
+    // Used by:
+    //  - resources/views/home.blade.php (Register as Employee button -> Open Modal)
+    //  - resources/views/partials/registerEmpModal.blade.php (may dalawang button, yun yung dalawang redirect)
+
+    
     public function redirectToGoogle()
     {
         return Socialite::driver('google')
@@ -53,7 +58,9 @@ class SocialAuthController extends Controller
             return redirect()->route('index')->with('error', 'Google login failed: ' . $e->getMessage());
         }
     }
-
+    
+    // ----------------------------------------------------------------------------------
+    // alam niyo na yan, pangalan palang ng controller HAHAHAHAHA
 
     public function redirectToFacebook()
     {

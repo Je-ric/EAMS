@@ -13,6 +13,8 @@ use Carbon\CarbonPeriod;
 
 class EmployeeController extends Controller
 {
+    // Used by:
+    //  - resources/views/home.blade.php (Employee Management Table)
     public function index()
     {
         $employees = Employee::with(['user', 'attendances'])->paginate(perPage: 5);
@@ -27,6 +29,10 @@ class EmployeeController extends Controller
 
         return view('home', compact('employees'));
     }
+
+    // Used by:
+    //  - resources/views/home.blade.php (admin only)
+    //  - resources/views/partials/employeeModal.blade.php (Add Employee form submits here)
 
     public function store(Request $request)
     {
@@ -62,6 +68,10 @@ class EmployeeController extends Controller
         return back()->with('success', 'Employee added successfully.');
     }
 
+    // Used by:
+    //  - resources/views/home.blade.php (admin only)
+    //  - resources/views/partials/employeeModal.blade.php (Edit Employee form submits here)    
+    
     public function update(Request $request)
     {
         $request->validate([
@@ -103,6 +113,8 @@ class EmployeeController extends Controller
         return back()->with('success', 'Employee updated successfully.');
     }
 
+    // Used by:
+    //  - resources/views/home.blade.php (admin only)
     public function destroy($id)
     {
         $employee = Employee::findOrFail($id);
@@ -121,29 +133,9 @@ class EmployeeController extends Controller
         return back()->with('success', 'Employee deleted successfully.');
     }
 
-    public function getAttendance($id)
-    {
-        try {
-            $employee = Employee::findOrFail($id);
 
-            $attendance = $employee->attendances()
-                ->limit(5)
-                ->get(['date', 'time_in', 'time_out']);
-
-            $data = $attendance->map(function ($a) {
-                return [
-                    'date'     => $a->date,
-                    'time_in'  => $a->time_in ?: null,
-                    'time_out' => $a->time_out ?: null,
-                ];
-            });
-
-            return response()->json(['success' => true, 'data' => $data], 200);
-        } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => 'Could not load attendance.'], 500);
-        }
-    }
-
+    // Used by:
+    //  - resources/views/EmpAttendance.blade.php 
     public function attendancePage($id, Request $request)
     {
         $employee = Employee::with('user')->findOrFail($id);
@@ -163,6 +155,7 @@ class EmployeeController extends Controller
         $endDate = Carbon::now()->startOfDay();
 
         // guard: if start is after today, clamp to today
+        // means wala pang attendance record
         if ($startDate->gt($endDate)) {
             $startDate = $endDate;
         }

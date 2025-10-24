@@ -9,9 +9,9 @@ use App\Models\User;
 
 class AuthController extends Controller
 {
-    /**
-     * Handle admin login
-     */
+    // admin lang toh
+    // Used by:
+    //      - resources/views/partials/adminModal.blade.php (Admin login modal form)
     public function login(Request $request)
     {
         $request->validate([

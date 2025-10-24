@@ -10,7 +10,9 @@ use Carbon\Carbon;
 
 class ExportController extends Controller
 {
-    // Export all attendances for a single employee (CSV)
+    // Export all attendances for a single employee (CSV) - kung sino man viniew
+    // Used by: 
+    //  - resources/views/EmpAttendance.blade.php (Export Attendance button)
     public function exportEmployee($id)
     {
         $employee = Employee::with('user')->findOrFail($id);
@@ -49,6 +51,8 @@ class ExportController extends Controller
     }
 
     // Export all today's attendance records (CSV)
+    // Used by: 
+    //  - resources/views/home.blade.php (Export Attendance button)
     public function exportToday()
     {
         $today = now()->toDateString();

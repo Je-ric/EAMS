@@ -10,9 +10,11 @@ use App\Models\User;
 
 class AttendanceController extends Controller
 {
-    /**
-     * Record Time In
-     */
+    
+    // Used by:
+    //  - resources/views/home.blade.php (Time In button opens modal -> submits here)
+    //  - resources/views/partials/passwordModal.blade.php (attendance modal submit for time-in)
+
     public function timeIn(Request $request)
     {
         $request->validate([
@@ -41,7 +43,7 @@ class AttendanceController extends Controller
             return back()->with('error', 'You already timed in today.');
         }
 
-        // Store in 24-hour format
+        // Store in 24-hour format, but viwe in 12-hour format
         $attendance->time_in = now()->format('H:i:s');
         $attendance->save();
 
@@ -51,9 +53,11 @@ class AttendanceController extends Controller
         return back()->with('success', 'Time-in recorded successfully.');
     }
 
-    /**
-     * Record Time Out
-     */
+    
+    // Used by:
+    //  - resources/views/home.blade.php (Time Out button opens modal -> submits here)
+    //  - resources/views/partials/passwordModal.blade.php (attendance modal submit for time-out)
+    
     public function timeOut(Request $request)
     {
         $request->validate([
@@ -86,7 +90,7 @@ class AttendanceController extends Controller
             return back()->with('error', 'You already timed out today.');
         }
 
-        // Store in 24-hour format
+        // same
         $attendance->time_out = now()->format('H:i:s');
         $attendance->save();
 
@@ -96,6 +100,11 @@ class AttendanceController extends Controller
         return back()->with('success', 'Time-out recorded successfully.');
     }
 
+    
+    // Update an existing attendance record
+    // Used by:
+    //  - resources/views/EmpAttendance.blade.php (Edit Attendance modal -> submits PUT to update)
+    
     public function updateAttendance(Request $request, $id)
     {
         $request->validate([
@@ -121,9 +130,12 @@ class AttendanceController extends Controller
         ]);
     }
 
-    /**
-     * Create attendance (admin add for missed date) — no password required
-     */
+    
+    // create attendance (admin add for missed date) — no password required
+    // Used by:
+    //  - resources/views/EmpAttendance.blade.php (Add Attendance button -> opens modal -> submits POST)
+    //  - AJAX /fetch from EmpAttendance page to create missed-day records without password
+    
     public function storeAttendance(Request $request)
     {
         $request->validate([

@@ -1,77 +1,127 @@
 <dialog id="attendanceSummaryModal" class="modal">
-    <div class="modal-box max-w-5xl">
-
-        <div class="flex justify-between items-center mb-4">
-            <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
-                <i class="fas fa-clipboard-list text-blue-600"></i>
-                Attendance Summary
-            </h2>
+    <div class="modal-box max-w-6xl p-6 bg-white rounded-xl shadow-lg">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-4 border-b pb-2">
+            <h3 class="text-2xl font-bold text-blue-700 flex items-center gap-2">
+                <i class='bx bx-calendar-check'></i> Attendance Summary
+            </h3>
             <form method="dialog">
-                <button class="btn btn-sm btn-circle btn-ghost hover:bg-gray-200">✕</button>
+                <button class="text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full p-1 transition">✕</button>
             </form>
         </div>
 
-        <div class="flex flex-col md:flex-row justify-between gap-3 mb-5">
-            <div class="flex flex-wrap items-center gap-3">
+        <!-- Filters -->
+        <div class="flex flex-col md:flex-row gap-4 mb-4">
+            <div class="flex items-center gap-2">
                 <label class="text-gray-700 font-medium">From:</label>
-                <input type="date" id="fromDate" class="input input-bordered input-sm w-40" />
-                <label class="text-gray-700 font-medium">To:</label>
-                <input type="date" id="toDate" class="input input-bordered input-sm w-40" />
-                <button class="btn btn-sm btn-primary gap-2">
-                    <i class="fas fa-filter"></i> Filter
-                </button>
+                <input type="date" id="summaryFrom" class="border rounded-md px-3 py-1 focus:ring-2 focus:ring-blue-500">
             </div>
+            <div class="flex items-center gap-2">
+                <label class="text-gray-700 font-medium">To:</label>
+                <input type="date" id="summaryTo" class="border rounded-md px-3 py-1 focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div class="flex gap-2">
+                <button id="filterSummaryBtn"
+                    class="bg-blue-600 hover:bg-blue-700 text-white rounded-md px-4 py-2 flex items-center gap-2 transition">
+                    <i class='bx bx-search'></i> Filter
+                </button>
 
-            <div class="flex items-center">
-                <label class="input input-bordered input-sm flex items-center gap-2 w-full md:w-64">
-                    <i class="fas fa-search text-gray-400"></i>
-                    <input type="text" id="employeeSearch" class="grow" placeholder="Search by employee/date..." />
-                </label>
+                <button id="exportSummaryBtn"
+                    class="bg-green-600 hover:bg-green-700 text-white rounded-md px-4 py-2 flex items-center gap-2 transition hidden">
+                    <i class='bx bx-download'></i> Export
+                </button>
             </div>
         </div>
 
-        <div class="overflow-x-auto rounded-lg border border-gray-200">
-            <table class="table table-zebra w-full text-center">
-                <thead class="bg-gradient-to-r from-blue-600 to-blue-500 text-white">
+        <!-- Table -->
+        <div id="summaryResults" class="overflow-x-auto border rounded-lg" style="max-height:400px; overflow:auto;">
+            <table class="min-w-full text-left border-collapse">
+                <thead class="bg-blue-50">
                     <tr>
-                        <th>#</th>
-                        <th>Profile</th>
-                        <th>Name</th>
-                        <th>Date</th>
-                        <th>Time In</th>
-                        <th>Time Out</th>
+                        <th class="px-4 py-2 border">#</th>
+                        <th class="px-4 py-2 border">Employee</th>
+                        <th class="px-4 py-2 border">Position</th>
+                        <th class="px-4 py-2 border">Date</th>
+                        <th class="px-4 py-2 border">Time In</th>
+                        <th class="px-4 py-2 border">Time Out</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr class="hover:bg-blue-50">
-                        <td>1</td>
-                        <td><img src="https://via.placeholder.com/40" class="mx-auto rounded-full border" /></td>
-                        <td class="font-semibold text-gray-800">John Doe</td>
-                        <td>2025-10-20</td>
-                        <td class="text-green-600 font-medium">8:30 AM</td>
-                        <td class="text-red-600 font-medium">5:00 PM</td>
-                    </tr>
+                <tbody id="summaryTableBody">
                     <tr>
-                        <td colspan="6" class="text-gray-400 py-3">No more records</td>
+                        <td colspan="6" class="text-center py-4 text-gray-500">
+                            Select a date range to view summary
+                        </td>
                     </tr>
                 </tbody>
             </table>
         </div>
-
-        <div class="flex justify-between items-center mt-5">
-            <button class="btn btn-outline btn-sm">Previous</button>
-            <span class="text-gray-700 font-medium">Page 1 of 1</span>
-            <button class="btn btn-outline btn-sm">Next</button>
-        </div>
-
-        <div class="modal-action">
-            <form method="dialog">
-                <button class="btn btn-neutral">Close</button>
-            </form>
-        </div>
     </div>
-
-    <form method="dialog" class="modal-backdrop">
-        <button>close</button>
-    </form>
 </dialog>
+
+<script>
+$(document).ready(function () {
+    // Helper: convert time to 12-hour format
+    function formatTo12Hour(timeString) {
+        if (!timeString) return '-';
+        const date = new Date(`1970-01-01T${timeString}`);
+        if (isNaN(date)) return timeString; // fallback
+        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+    }
+
+    $('#filterSummaryBtn').on('click', function (e) {
+        e.preventDefault();
+
+        const from = $('#summaryFrom').val();
+        const to = $('#summaryTo').val();
+
+        if (!from || !to) {
+            alert('Please select both From and To dates.');
+            return;
+        }
+
+        $.ajax({
+            url: "{{ route('attendance.summary') }}",
+            method: 'GET',
+            data: { from, to },
+            success: function (res) {
+                const tbody = $('#summaryTableBody');
+                tbody.empty();
+
+                if (res.length === 0) {
+                    tbody.append('<tr><td colspan="6" class="text-center py-4 text-gray-500">No records found.</td></tr>');
+                    $('#exportSummaryBtn').addClass('hidden');
+                    return;
+                }
+
+                res.forEach((row, i) => {
+                    const timeIn = formatTo12Hour(row.time_in);
+                    const timeOut = formatTo12Hour(row.time_out);
+
+                    tbody.append(`
+                        <tr>
+                            <td class="border px-4 py-2">${i + 1}</td>
+                            <td class="border px-4 py-2">${row.employee}</td>
+                            <td class="border px-4 py-2">${row.position}</td>
+                            <td class="border px-4 py-2 text-center">${row.date}</td>
+                            <td class="border px-4 py-2 text-center">${timeIn}</td>
+                            <td class="border px-4 py-2 text-center">${timeOut}</td>
+                        </tr>
+                    `);
+                });
+
+                // Show export button
+                $('#exportSummaryBtn').removeClass('hidden').data({ from, to });
+            },
+            error: function (xhr) {
+                alert('Failed to load summary.');
+            }
+        });
+    });
+
+    // Export Button
+    $('#exportSummaryBtn').on('click', function () {
+        const { from, to } = $(this).data();
+        window.location.href = `/attendance/export?from=${from}&to=${to}`;
+    });
+});
+</script>

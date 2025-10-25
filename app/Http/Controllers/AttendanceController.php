@@ -7,10 +7,12 @@ use Illuminate\Support\Facades\Hash;
 use App\Models\Employee;
 use App\Models\Attendance;
 use App\Models\User;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class AttendanceController extends Controller
 {
-    
+
     // Used by:
     //  - resources/views/home.blade.php (Time In button opens modal -> submits here)
     //  - resources/views/partials/passwordModal.blade.php (attendance modal submit for time-in)
@@ -53,11 +55,11 @@ class AttendanceController extends Controller
         return back()->with('success', 'Time-in recorded successfully.');
     }
 
-    
+
     // Used by:
     //  - resources/views/home.blade.php (Time Out button opens modal -> submits here)
     //  - resources/views/partials/passwordModal.blade.php (attendance modal submit for time-out)
-    
+
     public function timeOut(Request $request)
     {
         $request->validate([
@@ -100,11 +102,11 @@ class AttendanceController extends Controller
         return back()->with('success', 'Time-out recorded successfully.');
     }
 
-    
+
     // Update an existing attendance record
     // Used by:
     //  - resources/views/EmpAttendance.blade.php (Edit Attendance modal -> submits PUT to update)
-    
+
     public function updateAttendance(Request $request, $id)
     {
         $request->validate([
@@ -130,12 +132,12 @@ class AttendanceController extends Controller
         ]);
     }
 
-    
+
     // create attendance (admin add for missed date) — no password required
     // Used by:
     //  - resources/views/EmpAttendance.blade.php (Add Attendance button -> opens modal -> submits POST)
     //  - AJAX /fetch from EmpAttendance page to create missed-day records without password
-    
+
     public function storeAttendance(Request $request)
     {
         $request->validate([
@@ -164,4 +166,85 @@ class AttendanceController extends Controller
             'data' => $attendance
         ]);
     }
+
+
+public function summary(Request $request)
+{
+    $from = Carbon::parse($request->from)->startOfDay()->toDateString();
+    $to = Carbon::parse($request->to)->endOfDay()->toDateString();
+
+    $records = DB::table('attendance')
+        ->join('employees', 'attendance.emp_id', '=', 'employees.id')
+        ->join('users', 'employees.user_id', '=', 'users.id')
+        ->whereBetween('attendance.date', [$from, $to])
+        ->select(
+            'attendance.id',
+            'users.name as employee',
+            'employees.position',
+            'attendance.date',
+            'attendance.time_in',
+            'attendance.time_out',
+        )
+        ->orderBy('attendance.date', 'asc')
+        ->orderBy('users.name', 'asc')
+        ->get();
+
+    return response()->json($records);
+}
+public function export(Request $request)
+{
+    $from = Carbon::parse($request->from)->startOfDay()->toDateString();
+    $to = Carbon::parse($request->to)->endOfDay()->toDateString();
+
+    $records = DB::table('attendance')
+        ->join('employees', 'attendance.emp_id', '=', 'employees.id')
+        ->join('users', 'employees.user_id', '=', 'users.id')
+        ->whereBetween('attendance.date', [$from, $to])
+        ->select(
+            'attendance.date',
+            'users.name as employee',
+            'employees.position',
+            'attendance.time_in',
+            'attendance.time_out',
+        )
+        ->orderBy('attendance.date', 'asc')
+        ->orderBy('users.name', 'asc')
+        ->get()
+        ->groupBy('date'); // Group by date para hindi nakakalito
+
+    $filename = "attendance_detailed_{$from}_to_{$to}.csv";
+
+    header('Content-Type: text/csv');
+    header("Content-Disposition: attachment; filename={$filename}");
+
+    $handle = fopen('php://output', 'w');
+
+    foreach ($records as $date => $rows) {
+        // Section header per date
+        fputcsv($handle, []);
+        fputcsv($handle, ["Date: {$date}"]);
+        fputcsv($handle, ['Employee', 'Position', 'Time In', 'Time Out']);
+
+        foreach ($rows as $row) {
+            // Convert to 12-hour format with AM/PM
+            // kase by default we are saving 24 hour format
+            $timeIn = $row->time_in ? Carbon::parse($row->time_in)->format('h:i A') : '-';
+            $timeOut = $row->time_out ? Carbon::parse($row->time_out)->format('h:i A') : '-';
+
+            fputcsv($handle, [
+                $row->employee,
+                $row->position,
+                $timeIn,
+                $timeOut,
+            ]);
+        }
+    }
+
+    fclose($handle);
+    exit;
+}
+
+
+
+
 }

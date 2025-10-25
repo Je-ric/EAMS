@@ -23,6 +23,8 @@ Route::post('/attendance/time-in', [AttendanceController::class, 'timeIn'])->nam
 Route::post('/attendance/time-out', [AttendanceController::class, 'timeOut'])->name('attendance.timeOut');
 Route::put('/attendance/{id}', [AttendanceController::class, 'updateAttendance'])->name('attendance.update');
 Route::post('/attendance', [AttendanceController::class, 'storeAttendance'])->name('attendance.store');
+Route::get('/attendance/summary', [AttendanceController::class, 'summary'])->name('attendance.summary');
+Route::get('/attendance/export', [AttendanceController::class, 'export'])->name('attendance.export');
 
 
 Route::get('/auth/google', [SocialAuthController::class, 'redirectToGoogle'])->name('auth.google');

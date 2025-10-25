@@ -24,7 +24,6 @@ Route::post('/attendance/time-out', [AttendanceController::class, 'timeOut'])->n
 Route::put('/attendance/{id}', [AttendanceController::class, 'updateAttendance'])->name('attendance.update');
 Route::post('/attendance', [AttendanceController::class, 'storeAttendance'])->name('attendance.store');
 Route::get('/attendance/summary', [AttendanceController::class, 'summary'])->name('attendance.summary');
-Route::get('/attendance/export', [AttendanceController::class, 'export'])->name('attendance.export');
 
 
 Route::get('/auth/google', [SocialAuthController::class, 'redirectToGoogle'])->name('auth.google');
@@ -47,3 +46,5 @@ Route::get('/employees/{id}/attendance/export', [ExportController::class, 'expor
 Route::get('/attendance/export/today', [ExportController::class, 'exportToday'])->name('attendance.export.today');
 Route::get('/employees/{id}/attendance/export-pdf', [ExportController::class, 'exportEmployeePdf'])->name('employees.attendance.export.pdf');
 Route::get('/attendance/export/today-pdf', [ExportController::class, 'exportTodayPdf'])->name('attendance.export.today.pdf');
+Route::get('/export-summary/csv', [ExportController::class, 'exportSummaryCsv'])->name('export.summary.csv');
+Route::get('/export-summary/pdf', [ExportController::class, 'exportSummaryPdf'])->name('export.summary.pdf');

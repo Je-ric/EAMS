@@ -10,30 +10,39 @@
             </form>
         </div>
 
-        <!-- Filters -->
-        <div class="flex flex-col md:flex-row gap-4 mb-4">
-            <div class="flex items-center gap-2">
-                <label class="text-gray-700 font-medium">From:</label>
-                <input type="date" id="summaryFrom" class="border rounded-md px-3 py-1 focus:ring-2 focus:ring-blue-500">
-            </div>
-            <div class="flex items-center gap-2">
-                <label class="text-gray-700 font-medium">To:</label>
-                <input type="date" id="summaryTo" class="border rounded-md px-3 py-1 focus:ring-2 focus:ring-blue-500">
-            </div>
-            <div class="flex gap-2">
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-4">
+
+            <div class="flex flex-wrap items-end gap-3">
+                <div class="flex flex-col">
+                    <label for="summaryFrom" class="text-gray-700 font-medium">From:</label>
+                    <input type="date" id="summaryFrom"
+                        class="border rounded-md px-3 py-1 focus:ring-2 focus:ring-blue-500 w-44">
+                </div>
+                <div class="flex flex-col">
+                    <label for="summaryTo" class="text-gray-700 font-medium">To:</label>
+                    <input type="date" id="summaryTo"
+                        class="border rounded-md px-3 py-1 focus:ring-2 focus:ring-blue-500 w-44">
+                </div>
                 <button id="filterSummaryBtn"
-                    class="bg-blue-600 hover:bg-blue-700 text-white rounded-md px-4 py-2 flex items-center gap-2 transition">
+                    class="bg-blue-600 hover:bg-blue-700 text-white rounded-md px-4 py-2 flex items-center gap-2 transition mt-5 md:mt-0">
                     <i class='bx bx-search'></i> Filter
                 </button>
+            </div>
 
-                <button id="exportSummaryBtn"
-                    class="bg-green-600 hover:bg-green-700 text-white rounded-md px-4 py-2 flex items-center gap-2 transition hidden">
-                    <i class='bx bx-download'></i> Export
+            <div id="exportButtons" class="hidden flex gap-2 items-end">
+                <button id="exportSummaryCsv"
+                    class="bg-green-600 hover:bg-green-700 text-white rounded-md px-4 py-2 flex items-center gap-2 transition">
+                    <i class='bx bx-file'></i> Export CSV
+                </button>
+                <button id="exportSummaryPdf"
+                    class="bg-red-600 hover:bg-red-700 text-white rounded-md px-4 py-2 flex items-center gap-2 transition">
+                    <i class='bx bxs-file-pdf'></i> Export PDF
                 </button>
             </div>
+
         </div>
 
-        <!-- Table -->
+
         <div id="summaryResults" class="overflow-x-auto border rounded-lg" style="max-height:400px; overflow:auto;">
             <table class="min-w-full text-left border-collapse">
                 <thead class="bg-blue-50">
@@ -41,9 +50,9 @@
                         <th class="px-4 py-2 border">#</th>
                         <th class="px-4 py-2 border">Employee</th>
                         <th class="px-4 py-2 border">Position</th>
-                        <th class="px-4 py-2 border">Date</th>
-                        <th class="px-4 py-2 border">Time In</th>
-                        <th class="px-4 py-2 border">Time Out</th>
+                        <th class="px-4 py-2 border text-center">Date</th>
+                        <th class="px-4 py-2 border text-center">Time In</th>
+                        <th class="px-4 py-2 border text-center">Time Out</th>
                     </tr>
                 </thead>
                 <tbody id="summaryTableBody">
@@ -60,11 +69,11 @@
 
 <script>
 $(document).ready(function () {
-    // Helper: convert time to 12-hour format
+    // convert to 12-hour time
     function formatTo12Hour(timeString) {
         if (!timeString) return '-';
         const date = new Date(`1970-01-01T${timeString}`);
-        if (isNaN(date)) return timeString; // fallback
+        if (isNaN(date)) return timeString;
         return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
     }
 
@@ -89,7 +98,7 @@ $(document).ready(function () {
 
                 if (res.length === 0) {
                     tbody.append('<tr><td colspan="6" class="text-center py-4 text-gray-500">No records found.</td></tr>');
-                    $('#exportSummaryBtn').addClass('hidden');
+                    $('#exportButtons').addClass('hidden');
                     return;
                 }
 
@@ -109,19 +118,25 @@ $(document).ready(function () {
                     `);
                 });
 
-                // Show export button
-                $('#exportSummaryBtn').removeClass('hidden').data({ from, to });
+                // Show export buttons with current range
+                $('#exportButtons').removeClass('hidden').data({ from, to });
             },
-            error: function (xhr) {
+            error: function () {
                 alert('Failed to load summary.');
             }
         });
     });
 
-    // Export Button
-    $('#exportSummaryBtn').on('click', function () {
-        const { from, to } = $(this).data();
-        window.location.href = `/attendance/export?from=${from}&to=${to}`;
+    // CSV
+    $('#exportSummaryCsv').on('click', function () {
+        const { from, to } = $('#exportButtons').data();
+        window.location.href = `/export-summary/csv?from=${from}&to=${to}`;
+    });
+
+    // PDF
+    $('#exportSummaryPdf').on('click', function () {
+        const { from, to } = $('#exportButtons').data();
+        window.location.href = `/export-summary/pdf?from=${from}&to=${to}`;
     });
 });
 </script>

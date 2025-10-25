@@ -168,82 +168,29 @@ class AttendanceController extends Controller
     }
 
 
-public function summary(Request $request)
-{
-    $from = Carbon::parse($request->from)->startOfDay()->toDateString();
-    $to = Carbon::parse($request->to)->endOfDay()->toDateString();
+    public function summary(Request $request)
+    {
+        $from = Carbon::parse($request->from)->startOfDay()->toDateString();
+        $to = Carbon::parse($request->to)->endOfDay()->toDateString();
 
-    $records = DB::table('attendance')
-        ->join('employees', 'attendance.emp_id', '=', 'employees.id')
-        ->join('users', 'employees.user_id', '=', 'users.id')
-        ->whereBetween('attendance.date', [$from, $to])
-        ->select(
-            'attendance.id',
-            'users.name as employee',
-            'employees.position',
-            'attendance.date',
-            'attendance.time_in',
-            'attendance.time_out',
-        )
-        ->orderBy('attendance.date', 'asc')
-        ->orderBy('users.name', 'asc')
-        ->get();
+        $records = DB::table('attendance')
+            ->join('employees', 'attendance.emp_id', '=', 'employees.id')
+            ->join('users', 'employees.user_id', '=', 'users.id')
+            ->whereBetween('attendance.date', [$from, $to])
+            ->select(
+                'attendance.id',
+                'users.name as employee',
+                'employees.position',
+                'attendance.date',
+                'attendance.time_in',
+                'attendance.time_out',
+            )
+            ->orderBy('attendance.date', 'asc')
+            ->orderBy('users.name', 'asc')
+            ->get();
 
-    return response()->json($records);
-}
-public function export(Request $request)
-{
-    $from = Carbon::parse($request->from)->startOfDay()->toDateString();
-    $to = Carbon::parse($request->to)->endOfDay()->toDateString();
-
-    $records = DB::table('attendance')
-        ->join('employees', 'attendance.emp_id', '=', 'employees.id')
-        ->join('users', 'employees.user_id', '=', 'users.id')
-        ->whereBetween('attendance.date', [$from, $to])
-        ->select(
-            'attendance.date',
-            'users.name as employee',
-            'employees.position',
-            'attendance.time_in',
-            'attendance.time_out',
-        )
-        ->orderBy('attendance.date', 'asc')
-        ->orderBy('users.name', 'asc')
-        ->get()
-        ->groupBy('date'); // Group by date para hindi nakakalito
-
-    $filename = "attendance_detailed_{$from}_to_{$to}.csv";
-
-    header('Content-Type: text/csv');
-    header("Content-Disposition: attachment; filename={$filename}");
-
-    $handle = fopen('php://output', 'w');
-
-    foreach ($records as $date => $rows) {
-        // Section header per date
-        fputcsv($handle, []);
-        fputcsv($handle, ["Date: {$date}"]);
-        fputcsv($handle, ['Employee', 'Position', 'Time In', 'Time Out']);
-
-        foreach ($rows as $row) {
-            // Convert to 12-hour format with AM/PM
-            // kase by default we are saving 24 hour format
-            $timeIn = $row->time_in ? Carbon::parse($row->time_in)->format('h:i A') : '-';
-            $timeOut = $row->time_out ? Carbon::parse($row->time_out)->format('h:i A') : '-';
-
-            fputcsv($handle, [
-                $row->employee,
-                $row->position,
-                $timeIn,
-                $timeOut,
-            ]);
-        }
+        return response()->json($records);
     }
-
-    fclose($handle);
-    exit;
-}
-
 
 
 

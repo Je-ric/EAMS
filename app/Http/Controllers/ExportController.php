@@ -165,6 +165,8 @@ class ExportController extends Controller
             fputcsv($handle, ['Employee', 'Position', 'Time In', 'Time Out']);
 
             foreach ($rows as $row) {
+                // convert 24 to 12 hour format, just for view
+                // kase nga were storing 24 hour
                 $timeIn = $row->time_in ? Carbon::parse($row->time_in)->format('h:i A') : '-';
                 $timeOut = $row->time_out ? Carbon::parse($row->time_out)->format('h:i A') : '-';
 

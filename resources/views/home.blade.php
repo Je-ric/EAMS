@@ -31,8 +31,12 @@
                 @auth
                     @if (Auth::user()->role === 'admin')
                         <a href="{{ route('attendance.export.today') }}"
-                            class="ml-4 inline-flex items-center gap-2 px-3 py-1.5 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition">
+                            class="ml-2 inline-flex items-center gap-2 px-3 py-1.5 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition">
                             <i class="bx bx-download"></i> Export CSV
+                        </a>
+                        <a href="{{ route('attendance.export.today.pdf') }}"
+                            class="ml-2 inline-flex items-center gap-2 px-3 py-1.5 bg-red-600 text-white rounded-md hover:bg-red-700 transition">
+                            <i class="bx bxs-file-pdf"></i> Export PDF
                         </a>
                     @endif
                 @endauth
@@ -272,5 +276,5 @@
 
     </script>
 
-    
+
 @endsection

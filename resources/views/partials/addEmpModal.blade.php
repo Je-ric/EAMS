@@ -53,12 +53,20 @@
             </div>
 
             <div>
-                <input type="text"
+                <label for="position" class="block text-gray-700 font-medium mb-2">Position</label>
+                <select id="position"
                         name="position"
-                        placeholder="Position"
                         required
-                    class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500" />
+                        class="w-full border border-gray-300 rounded-md px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                    <option value="" disabled selected>Select Position</option>
+                    <option value="Project Manager">Project Manager</option>
+                    <option value="Human Resources (HR) Manager">Human Resources (HR) Manager</option>
+                    <option value="Finance Manager">Finance Manager</option>
+                    <option value="Department Head">Department Head</option>
+                    <option value="Assistant">Assistant</option>
+                </select>
             </div>
+
 
             <div class="pt-4">
                 <button type="submit"

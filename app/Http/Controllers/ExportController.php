@@ -7,11 +7,12 @@ use App\Models\Attendance;
 use App\Models\Employee;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Carbon\Carbon;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class ExportController extends Controller
 {
     // Export all attendances for a single employee (CSV) - kung sino man viniew
-    // Used by: 
+    // Used by:
     //  - resources/views/EmpAttendance.blade.php (Export Attendance button)
     public function exportEmployee($id)
     {
@@ -51,7 +52,7 @@ class ExportController extends Controller
     }
 
     // Export all today's attendance records (CSV)
-    // Used by: 
+    // Used by:
     //  - resources/views/home.blade.php (Export Attendance button)
     public function exportToday()
     {
@@ -92,4 +93,36 @@ class ExportController extends Controller
 
         return $response;
     }
+
+
+
+
+    public function exportEmployeePdf($id)
+    {
+        $employee = Employee::with('user', 'attendances')->findOrFail($id);
+        $attendances = $employee->attendances()->orderBy('date')->get();
+
+        $pdf = Pdf::loadView('pdf.employee_pdf', compact('employee', 'attendances'))
+            ->setPaper('a4', 'portrait');
+
+        $filename = 'attendance_employee_' . preg_replace('/[^A-Za-z0-9_\-]/', '_', ($employee->user->name ?? 'emp_'.$id)) . '_' . now()->format('Ymd') . '.pdf';
+
+        return $pdf->download($filename);
+    }
+
+    public function exportTodayPdf()
+    {
+        $today = now()->toDateString();
+        $attendances = Attendance::where('date', $today)
+            ->with('employee.user')
+            ->orderBy('emp_id')
+            ->get();
+
+        $pdf = Pdf::loadView('pdf.today_pdf', compact('attendances', 'today'))
+            ->setPaper('a4', 'landscape');
+
+        $filename = 'attendance_today_' . now()->format('Ymd') . '.pdf';
+        return $pdf->download($filename);
+    }
+
 }

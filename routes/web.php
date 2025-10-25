@@ -43,3 +43,5 @@ Route::get('/auth/facebook/callback', [SocialAuthController::class, 'handleFaceb
 
 Route::get('/employees/{id}/attendance/export', [ExportController::class, 'exportEmployee'])->name('employees.attendance.export');
 Route::get('/attendance/export/today', [ExportController::class, 'exportToday'])->name('attendance.export.today');
+Route::get('/employees/{id}/attendance/export-pdf', [ExportController::class, 'exportEmployeePdf'])->name('employees.attendance.export.pdf');
+Route::get('/attendance/export/today-pdf', [ExportController::class, 'exportTodayPdf'])->name('attendance.export.today.pdf');

@@ -24,10 +24,17 @@
                 {{ \Carbon\Carbon::parse($endDate)->format('M d, Y') }}
             </h3>
 
-            <a href="{{ route('employees.attendance.export', $employee->id) }}"
-                class="ml-4 inline-flex items-center gap-2 px-3 py-1.5 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition">
-                <i class="bx bx-download"></i> Export CSV
-            </a>
+            <div>
+                <a href="{{ route('employees.attendance.export', $employee->id) }}"
+                    class="ml-4 inline-flex items-center gap-2 px-3 py-1.5 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition">
+                    <i class="bx bx-download"></i> Export CSV
+                </a>
+                <a href="{{ route('employees.attendance.export.pdf', $employee->id) }}"
+                    class="ml-4 inline-flex items-center gap-2 px-3 py-1.5 bg-red-600 text-white rounded-md hover:bg-red-700 transition">
+                    <i class="bx bxs-file-pdf"></i> Export PDF
+                </a>
+            </div>
+
         </div>
 
         <div class="overflow-x-auto">

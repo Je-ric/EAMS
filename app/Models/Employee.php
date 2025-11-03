@@ -14,11 +14,13 @@ class Employee extends Model
         'login_provider',
     ];
 
+    // Each employee belongs to one user)
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
+    // Each employee can have multiple attendance records, then sorted by date descending (latest first)
     public function attendances()
     {
         return $this->hasMany(Attendance::class, 'emp_id')

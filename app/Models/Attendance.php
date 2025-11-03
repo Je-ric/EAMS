@@ -12,6 +12,7 @@ class Attendance extends Model
         'emp_id', 'date', 'time_in', 'time_out',
     ];
 
+    // Each attendance record belongs to an employee
     public function employee()
     {
         return $this->belongsTo(Employee::class, 'emp_id');

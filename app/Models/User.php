@@ -47,6 +47,7 @@ class User extends Authenticatable
         ];
     }
 
+    // Each user has one employee profile
     public function employee()
     {
         return $this->hasOne(Employee::class);

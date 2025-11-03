@@ -89,109 +89,137 @@
     @include('partials.editAttendanceModal')
 
     <script>
-const employeeId = {{ $employee->id }};
+        const employeeId = {{ $employee->id }};
 
-function openEditAttendance(attendanceId = null, timeIn = '', timeOut = '', date = '') {
-    const editId = document.getElementById('edit_attendance_id');
-    const editEmp = document.getElementById('edit_attendance_emp_id');
-    const editDate = document.getElementById('edit_attendance_date');
-    const editTimeIn = document.getElementById('edit_time_in');
-    const editTimeOut = document.getElementById('edit_time_out');
-    const modal = document.getElementById('editAttendanceModal');
+        // similar to the functions in home.blade.php for handling modals
+        // table -> function -> modal
+        // para tamang employee ang maedit or maakit ng attendance
+        // in this case, para correct employee attendance ang ma-edit
+        function openEditAttendance(attendanceId = null, timeIn = '', timeOut = '', date = '') {
+            const editId = document.getElementById('edit_attendance_id');
+            const editEmp = document.getElementById('edit_attendance_emp_id');
+            const editDate = document.getElementById('edit_attendance_date');
+            const editTimeIn = document.getElementById('edit_time_in');
+            const editTimeOut = document.getElementById('edit_time_out');
+            const modal = document.getElementById('editAttendanceModal');
 
-    if (editId) editId.value = attendanceId ?? '';
-    if (editEmp) editEmp.value = employeeId;
-    if (editDate) editDate.value = date ?? '';
-    if (editTimeIn) editTimeIn.value = timeIn ? timeIn.slice(0,5) : '';
-    if (editTimeOut) editTimeOut.value = timeOut ? timeOut.slice(0,5) : '';
+            if (editId) editId.value = attendanceId ?? '';
+            if (editEmp) editEmp.value = employeeId;
+            if (editDate) editDate.value = date ?? '';
+            if (editTimeIn) editTimeIn.value = timeIn ? timeIn.slice(0, 5) : '';
+            if (editTimeOut) editTimeOut.value = timeOut ? timeOut.slice(0, 5) : '';
 
-    if (modal && typeof modal.showModal === 'function') {
-        modal.showModal();
-    } else {
-        console.error('Modal element not found or showModal not supported.');
-    }
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    const form = document.getElementById('editAttendanceForm');
-    if (!form) return;
-
-    form.addEventListener('submit', function (e) {
-        e.preventDefault();
-
-        const id = (document.getElementById('edit_attendance_id') || {}).value || '';
-        const empId = (document.getElementById('edit_attendance_emp_id') || {}).value || employeeId;
-        const date = (document.getElementById('edit_attendance_date') || {}).value || '';
-        let timeIn = (document.getElementById('edit_time_in') || {}).value || '';
-        let timeOut = (document.getElementById('edit_time_out') || {}).value || '';
-
-        timeIn = timeIn ? timeIn + ':00' : null;
-        timeOut = timeOut ? timeOut + ':00' : null;
-
-        const isCreate = !id;
-        const url = isCreate ? `{{ route('attendance.store') }}` : `/attendance/${id}`;
-        const method = isCreate ? 'POST' : 'PUT';
-
-        const payload = isCreate
-            ? { emp_id: empId, date: date, time_in: timeIn, time_out: timeOut }
-            : { time_in: timeIn, time_out: timeOut };
-
-        fetch(url, {
-            method: method,
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            },
-            body: JSON.stringify(payload)
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (!data || !data.success) {
-                alert(data?.message || 'Failed to save attendance.');
-                return;
+            if (modal && typeof modal.showModal === 'function') {
+                modal.showModal();
+            } else {
+                console.error('Modal element not found or showModal not supported.');
             }
+        }
 
-            const a = data.data;
-            const dateKey = date.replace(/-/g, '');
-            const placeholderId = 'attendance-row-date' + dateKey;
-            const newRowId = 'attendance-row-' + a.id;
-            let row = document.getElementById(newRowId) || document.getElementById(placeholderId);
+        // sends AJAX request to store or update attendance
+        // - For "Add Attendance" (attendanceId == null), the modal will submit a POST to:
+        //     route('attendance.store') -> AttendanceController::storeAttendance
+        // - For "Edit Attendance" (attendanceId != null), the modal will submit a PUT to:
+        //     /attendance/{id} -> AttendanceController::updateAttendance
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('editAttendanceForm');
+            if (!form) return;
 
-            const timesHtml = (a.time_in ? formatTime(a.time_in) : '-') + ' - ' + (a.time_out ? formatTime(a.time_out) : 'No record yet');
-            const actionHtml = `<button class="flex items-center gap-1 px-3 py-1.5 bg-yellow-500 text-white rounded-lg hover:bg-yellow-500 transition"
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                // collect data
+                const id = (document.getElementById('edit_attendance_id') || {}).value || '';
+                const empId = (document.getElementById('edit_attendance_emp_id') || {}).value || employeeId;
+                const date = (document.getElementById('edit_attendance_date') || {}).value || '';
+                let timeIn = (document.getElementById('edit_time_in') || {}).value || '';
+                let timeOut = (document.getElementById('edit_time_out') || {}).value || '';
+
+                timeIn = timeIn ? timeIn + ':00' : null;
+                timeOut = timeOut ? timeOut + ':00' : null;
+
+                // determine if create ba or update
+                const isCreate = !id;
+                const url = isCreate ? `{{ route('attendance.store') }}` : `/attendance/${id}`;
+                const method = isCreate ? 'POST' : 'PUT';
+
+                // sent relevant data kung update man or create
+                // - create needs emp_id, date, time_in, time_out
+                // - update needs time_in, time_out (emp_id and date are fixed) again if update
+                const payload = isCreate ?
+                    {
+                        emp_id: empId,
+                        date: date,
+                        time_in: timeIn,
+                        time_out: timeOut
+                    } :
+                    {
+                        time_in: timeIn,
+                        time_out: timeOut
+                    };
+
+                // send ajx request
+                fetch(url, {
+                        method: method,
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify(payload)
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (!data || !data.success) {
+                            alert(data?.message || 'Failed to save attendance.');
+                            return;
+                        }
+
+                        // for updating the table row without reloading
+                        // mainly for UI updates dynamically
+                        const a = data.data;
+                        const dateKey = date.replace(/-/g, '');
+                        const placeholderId = 'attendance-row-date' + dateKey;
+                        const newRowId = 'attendance-row-' + a.id;
+                        let row = document.getElementById(newRowId) || document.getElementById(
+                            placeholderId);
+
+                        const timesHtml = (a.time_in ? formatTime(a.time_in) : '-') + ' - ' + (a
+                            .time_out ? formatTime(a.time_out) : 'No record yet');
+                        const actionHtml = `<button class="flex items-center gap-1 px-3 py-1.5 bg-yellow-500 text-white rounded-lg hover:bg-yellow-500 transition"
                                     onclick="openEditAttendance(${a.id}, '${a.time_in ?? ''}', '${a.time_out ?? ''}', '${a.date}')">
                                     <i class="bx bx-edit"></i> Edit Attendance
                                 </button>`;
 
-            if (row) {
-                row.id = newRowId;
-                const timesCell = row.querySelector('.attendance-times');
-                if (timesCell) timesCell.innerHTML = timesHtml;
-                const actionCell = row.querySelector('td:last-child');
-                if (actionCell) actionCell.innerHTML = actionHtml;
-            }
+                        // Updates the time column and action column dynamically without reloading the page.
+                        if (row) {
+                            row.id = newRowId;
+                            const timesCell = row.querySelector('.attendance-times');
+                            if (timesCell) timesCell.innerHTML = timesHtml;
+                            const actionCell = row.querySelector('td:last-child');
+                            if (actionCell) actionCell.innerHTML = actionHtml;
+                        }
 
-            const modal = document.getElementById('editAttendanceModal');
-            if (modal && typeof modal.close === 'function') modal.close();
+                        const modal = document.getElementById('editAttendanceModal');
+                        if (modal && typeof modal.close === 'function') modal.close();
 
-            alert(data.message || 'Saved.');
-        })
-        .catch(err => {
-            console.error(err);
-            alert('Error saving attendance.');
+                        alert(data.message || 'Saved.');
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        alert('Error saving attendance.');
+                    });
+            });
         });
-    });
-});
 
-function formatTime(val) {
-    if (!val) return '-';
-    const parts = val.split(':');
-    let h = parseInt(parts[0], 10);
-    const m = (parts[1] || '00').padStart(2, '0');
-    const ampm = h >= 12 ? 'PM' : 'AM';
-    h = h % 12;
-    h = h ? h : 12;
-    return `${h.toString().padStart(2, '0')}:${m} ${ampm}`;
-}
+        function formatTime(val) {
+            if (!val) return '-';
+            const parts = val.split(':');
+            let h = parseInt(parts[0], 10);
+            const m = (parts[1] || '00').padStart(2, '0');
+            const ampm = h >= 12 ? 'PM' : 'AM';
+            h = h % 12;
+            h = h ? h : 12;
+            return `${h.toString().padStart(2, '0')}:${m} ${ampm}`;
+        }
     </script>
 @endsection

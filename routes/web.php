@@ -42,9 +42,12 @@ Route::get('/auth/facebook/callback', [SocialAuthController::class, 'handleFaceb
 //     return redirect()->route('index')->with('success', 'Logged out successfully.');
 // });
 
+
 Route::get('/employees/{id}/attendance/export', [ExportController::class, 'exportEmployee'])->name('employees.attendance.export');
 Route::get('/attendance/export/today', [ExportController::class, 'exportToday'])->name('attendance.export.today');
+
 Route::get('/employees/{id}/attendance/export-pdf', [ExportController::class, 'exportEmployeePdf'])->name('employees.attendance.export.pdf');
 Route::get('/attendance/export/today-pdf', [ExportController::class, 'exportTodayPdf'])->name('attendance.export.today.pdf');
+
 Route::get('/export-summary/csv', [ExportController::class, 'exportSummaryCsv'])->name('export.summary.csv');
 Route::get('/export-summary/pdf', [ExportController::class, 'exportSummaryPdf'])->name('export.summary.pdf');

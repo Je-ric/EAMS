@@ -43,6 +43,7 @@
 
                 @guest
                     <div>
+                        {{-- partials/registerEmployeeModal.blade.php --}}
                         <button
                             class="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition"
                             onclick="registerEmployeeModal.showModal()">
@@ -53,16 +54,20 @@
 
                 @auth
                     @if (Auth::user()->role === 'admin')
+                        {{-- partials/attendanceSummaryModal.blade.php --}}
                         <button
                             class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
                             onclick="attendanceSummaryModal.showModal()">
                             <i class='bx bx-clipboard'></i> Summary
                         </button>
+
+                        {{-- partials/addEmpModal.blade.php --}}
                         <button
                             class="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition"
                             onclick="addModal.showModal()">
                             <i class='bx bx-user-plus'></i> Add Employee
                         </button>
+
                         <form method="POST" action="{{ route('admin.logout') }}">
                             @csrf
                             <button type="submit"
@@ -72,6 +77,7 @@
                         </form>
                     @endif
                 @else
+                    {{-- partials/adminModal.blade.php --}}
                     <button
                         class="flex items-center gap-2 px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-800 transition"
                         onclick="document.getElementById('adminDialog').showModal()">
@@ -113,6 +119,9 @@
                                 {{ $employee->user->name ?? 'N/A' }}
                             </td>
                             <td class="px-4 py-2 text-gray-600">
+                                {{-- gumamit tayo ng checker dito
+                                when account is created using google or facebook, nagseset tayo ng password na "password123"
+                                yung reason for that is hindi kase nullable password, kaya we set a predefined password--}}
                                 @php
                                     $isNewRegistered =
                                         isset($employee->user->password) &&
@@ -121,6 +130,10 @@
                                             $employee->user->password,
                                         );
                                 @endphp
+                                {{-- Ngayon may condtion tayo, if account password is "password123", ibig sabihin new account siya,
+                                visible siya sa both admin and employee, magsisilbi kasing HR si admin na need maghandle and magset ng password,
+                                inshort, indicator yung "password123" na need talagang magpalit ng password,
+                                dahil don everytime na den na magseset si admin ng "password123" may indicator pa din yon, hindi lang for new user.--}}
                                 @if ($isNewRegistered)
                                     <span
                                         class="ml-2 inline-block text-xs px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full">
@@ -151,15 +164,20 @@
                                 @auth
                                     @if (Auth::user()->role === 'admin')
                                         <div class="flex justify-center gap-2 flex-wrap">
+                                            {{-- partials/updateEmpModal.blade.php --}}
                                             <button
                                                 class="flex items-center gap-1 px-3 py-1.5 bg-yellow-400 text-white rounded-lg hover:bg-yellow-500 transition"
                                                 onclick="openUpdateModal({{ $employee->id }}, {{ $employee->user->id ?? 'null' }}, '{{ addslashes($employee->user->name ?? '') }}', '{{ addslashes($employee->position) }}', '{{ addslashes($employee->user->email ?? '') }}', '{{ addslashes($employee->emp_pic ? asset('storage/' . $employee->emp_pic) : asset('pics/default.png')) }}', '{{ addslashes($employee->login_provider ?? '') }}')">
                                                 <i class='bx bx-edit'></i> Edit
                                             </button>
+
+                                            {{-- EmpAttendance.blade.php --}}
                                             <a href="{{ route('employees.attendance.page', $employee->id) }}"
                                                 class="flex items-center gap-1 px-3 py-1.5 bg-cyan-500 text-white rounded-lg hover:bg-cyan-600 transition">
                                                 <i class='bx bx-calendar-check'></i> Attendances
                                             </a>
+
+
                                             <form method="POST" action="{{ route('employees.destroy', $employee->id) }}"
                                                 onsubmit="return confirm('Are you sure?')">
                                                 @csrf
@@ -173,6 +191,7 @@
                                     @endif
                                 @else
                                     <div class="flex justify-center gap-2 flex-wrap">
+                                        {{-- partials/passwordModal.blade.php --}}
                                         <button
                                             class="flex items-center gap-1 px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
                                             data-email="{{ $employee->user->email }}"
@@ -181,6 +200,7 @@
                                             <i class='bx bx-log-in'></i> Time In
                                         </button>
 
+                                        {{-- partials/passwordModal.blade.php --}}
                                         <button
                                             class="flex items-center gap-1 px-3 py-1.5 bg-red-500 text-white rounded-lg hover:bg-red-600 transition disabled:opacity-50"
                                             data-email="{{ $employee->user->email }}"

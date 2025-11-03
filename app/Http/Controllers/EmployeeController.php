@@ -70,8 +70,8 @@ class EmployeeController extends Controller
 
     // Used by:
     //  - resources/views/home.blade.php (admin only)
-    //  - resources/views/partials/employeeModal.blade.php (Edit Employee form submits here)    
-    
+    //  - resources/views/partials/employeeModal.blade.php (Edit Employee form submits here)
+
     public function update(Request $request)
     {
         $request->validate([
@@ -135,7 +135,7 @@ class EmployeeController extends Controller
 
 
     // Used by:
-    //  - resources/views/EmpAttendance.blade.php 
+    //  - resources/views/EmpAttendance.blade.php
     public function attendancePage($id, Request $request)
     {
         $employee = Employee::with('user')->findOrFail($id);
@@ -177,33 +177,34 @@ class EmployeeController extends Controller
             ->with('startDate', $startDate)
             ->with('endDate', $endDate);
     }
-public function search(Request $request)
-{
-    $query = $request->get('query', '');
 
-    $employees = Employee::with(['user', 'attendances'])
-        ->whereHas('user', function ($q) use ($query) {
-            $q->where('name', 'like', "%{$query}%")
-              ->orWhere('email', 'like', "%{$query}%");
-        })
-        ->orWhere('position', 'like', "%{$query}%")
-        ->paginate(5);
+    public function search(Request $request)
+    {
+        $query = $request->get('query', '');
 
-    $today = now()->toDateString();
+        $employees = Employee::with(['user', 'attendances'])
+            ->whereHas('user', function ($q) use ($query) {
+                $q->where('name', 'like', "%{$query}%")
+                ->orWhere('email', 'like', "%{$query}%");
+            })
+            ->orWhere('position', 'like', "%{$query}%")
+            ->paginate(5);
 
-    $employees->getCollection()->transform(function ($employee) use ($today) {
-        $todayAttendance = $employee->attendances->firstWhere('date', $today);
-        $employee->timeInDone = $todayAttendance && $todayAttendance->time_in ? true : false;
-        $employee->timeOutDone = $todayAttendance && $todayAttendance->time_out ? true : false;
-        return $employee;
-    });
+        $today = now()->toDateString();
 
-    // Return partial view (for table body)
-    return response()->json([
-        'html' => view('partials.employeeTableRows', compact('employees'))->render(),
-        'pagination' => view('vendor.pagination.custom', ['paginator' => $employees])->render()
-    ]);
-}
+        $employees->getCollection()->transform(function ($employee) use ($today) {
+            $todayAttendance = $employee->attendances->firstWhere('date', $today);
+            $employee->timeInDone = $todayAttendance && $todayAttendance->time_in ? true : false;
+            $employee->timeOutDone = $todayAttendance && $todayAttendance->time_out ? true : false;
+            return $employee;
+        });
+
+        // Return partial view (for table body)
+        return response()->json([
+            'html' => view('partials.employeeTableRows', compact('employees'))->render(),
+            'pagination' => view('vendor.pagination.custom', ['paginator' => $employees])->render()
+        ]);
+    }
 
 
 }

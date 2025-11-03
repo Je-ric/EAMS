@@ -14,20 +14,26 @@ class SocialAuthController extends Controller
     //  - resources/views/home.blade.php (Register as Employee button -> Open Modal)
     //  - resources/views/partials/registerEmpModal.blade.php (may dalawang button, yun yung dalawang redirect)
 
-    
     public function redirectToGoogle()
     {
         return Socialite::driver('google')
-            ->stateless()
-            ->with(['prompt' => 'select_account'])
+            ->stateless() // for Google to avoid session state when needed.
+            ->with(['prompt' => 'select_account']) // always ask account
             ->redirect();
     }
 
+    // Flow:
+    // 1 Retrieve user info from Google.
+    // 2 Create or update a User by email.
+    // 3 Create or update an Employee tied to that user.
+    // 4 Redirect back to index on success, or return with error message on failure.
     public function handleGoogleCallback()
     {
         try {
+            // 1
             $googleUser = Socialite::driver('google')->stateless()->user();
 
+            // 2
             $user = User::updateOrCreate(
                 ['email' => $googleUser->getEmail()],
                 [
@@ -43,6 +49,7 @@ class SocialAuthController extends Controller
                 ]
             );
 
+            // 3
             $employee = Employee::updateOrCreate(
                 ['user_id' => $user->id],
                 [
@@ -52,15 +59,17 @@ class SocialAuthController extends Controller
                 ]
             );
 
-
+            // 4 success
             return redirect()->route('index');
         } catch (\Exception $e) {
+            // 4 failure
             return redirect()->route('index')->with('error', 'Google login failed: ' . $e->getMessage());
         }
     }
-    
+
     // ----------------------------------------------------------------------------------
     // alam niyo na yan, pangalan palang ng controller HAHAHAHAHA
+    // same process as google auth
 
     public function redirectToFacebook()
     {

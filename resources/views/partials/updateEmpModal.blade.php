@@ -11,6 +11,7 @@
             </form>
         </div>
 
+        {{-- EmployeeController::update() --}}
         <form method="POST" action="{{ route('employees.update') }}" id="updateForm" enctype="multipart/form-data"
             class="space-y-4">
             @csrf

@@ -1,4 +1,6 @@
 <dialog id="adminDialog" class="modal">
+
+    {{-- AuthController::login() --}}
     <form method="POST" action="{{ route('admin.login.submit') }}"
         class="modal-box max-w-sm p-6 rounded-xl shadow-lg bg-white">
         @csrf

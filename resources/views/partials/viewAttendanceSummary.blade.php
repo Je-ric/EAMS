@@ -1,6 +1,6 @@
 <dialog id="attendanceSummaryModal" class="modal">
     <div class="modal-box max-w-6xl p-6 bg-white rounded-xl shadow-lg">
-        <!-- Header -->
+        
         <div class="flex justify-between items-center mb-4 border-b pb-2">
             <h3 class="text-2xl font-bold text-blue-700 flex items-center gap-2">
                 <i class='bx bx-calendar-check'></i> Attendance Summary

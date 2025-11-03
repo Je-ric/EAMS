@@ -1,4 +1,6 @@
 <dialog id="editAttendanceModal" class="modal">
+
+    {{-- AttendanceController::edit() --}}
     <form id="editAttendanceForm" class="modal-box max-w-md p-6 rounded-xl shadow-lg bg-white">
         @csrf
 

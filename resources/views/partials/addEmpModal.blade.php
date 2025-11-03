@@ -12,6 +12,7 @@
             </form>
         </div>
 
+        {{-- EmployeeController::store() --}}
         <form id="addEmployeeForm"
             method="POST"
             action="{{ route('employees.store') }}"

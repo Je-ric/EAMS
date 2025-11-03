@@ -178,6 +178,9 @@ class EmployeeController extends Controller
             ->with('endDate', $endDate);
     }
 
+
+    // Used by:
+    //  - AJAX /fetch from (search - home.blade.php)
     public function search(Request $request)
     {
         $query = $request->get('query', '');
@@ -200,9 +203,15 @@ class EmployeeController extends Controller
         });
 
         // Return partial view (for table body)
+        // may comment din sa employeeTableRows.blade.php
+        // so every search may update sa UI, every search nagrerender ng dalawang view na toh, focus sa table
+        // again, ginagawa ito para magupdate yung table at pagination dynamically, at hindi na magreload buong page
+        // and kung mapapansin niyo, similar lang yung structure nito sa index() method above,
+        // kase by default, index() yung pang-display, we use search() para mag-filter ng output,
+        // additional lang yung query filter and rendering
         return response()->json([
-            'html' => view('partials.employeeTableRows', compact('employees'))->render(),
-            'pagination' => view('vendor.pagination.custom', ['paginator' => $employees])->render()
+            'html' => view('partials.employeeTableRows', compact('employees'))->render(), // 1
+            'pagination' => view('vendor.pagination.custom', ['paginator' => $employees])->render() // 2
         ]);
     }
 

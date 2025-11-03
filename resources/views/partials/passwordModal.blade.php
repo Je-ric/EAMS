@@ -1,4 +1,11 @@
+{{--
+    Pag submit, proceed to AttendanceController@timeIn or AttendanceController@timeOut via AJAX (form.action is set dynamically).
+    - Who uses what:
+        The modal uses 'email' and 'password' to the AttendanceController.
+--}}
 <dialog id="passwordDialog" class="modal">
+
+    {{--  --}}
     <form id="attendanceForm"
             method="POST"
             action=""
@@ -50,11 +57,13 @@
         $('#attendanceForm').on('submit', function(e) {
             e.preventDefault();
 
+            // collect data
             const form = $(this);
             const url = form.attr('action');
             const email = $('#empEmailInput').val();
             const passwordInput = form.find('input[name="password"]');
 
+            // send AJAX request to AttendanceController
             $.ajax({
                 url: url,
                 method: 'POST',
@@ -64,6 +73,7 @@
                     _token: '{{ csrf_token() }}'
                 },
                 success: function(res) {
+                    // pag success
                     if (res.success || res.message) {
                         alert(res.success || res.message || 'Attendance recorded successfully!');
                         $('#passwordDialog')[0].close();
@@ -71,25 +81,22 @@
 
                         // Find the employee row by email
                         const row = $('button[data-email="' + email + '"]').closest('tr');
-                        let now = new Date();
+                        let now = new Date(); // get current time
                         let formatted = now.toLocaleTimeString([], {
                             hour: '2-digit',
                             minute: '2-digit',
                             hour12: true
                         });
 
-                        let cell = row.find('td').eq(4); // Attendance column
+                        let cell = row.find('td').eq(4); // select Attendance column
                         let html = cell.html().trim();
 
-                        // Attendance cell update
-                        if (url.includes('time-in')) {
-                            // Only time in exists, leave time out blank
-                            cell.html(`${formatted}`);
-                            // Disable Time In, enable Time Out
+                        // Attendance cell update (mainly ui lang)
+                        if (url.includes('time-in')) { // Only time in exists, leave time out blank
+                            cell.html(`${formatted}`); // Disable Time In, enable Time Out
                             row.find('button:contains("Time In")').prop('disabled', true);
                             row.find('button:contains("Time Out")').prop('disabled', false);
-                        } else {
-                            // Time out recorded
+                        } else { // Time out recorded
                             let timeIn = html.split('-')[0].trim();
                             if (!timeIn) timeIn = formatted; // fallback if cell was empty
                             cell.html(timeIn ? `${timeIn} - ${formatted}` : `${formatted}`);

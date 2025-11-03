@@ -10,6 +10,10 @@ use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
 
+// Used for exporting attendance data in CSV and PDF formats
+// meron tayong pdf folder sa views, that files are use for formatting the PDF exports
+// Question, bakit PDF format lang at walang CSV format?
+// Answer: CSV exports are handled directly dito sa controller, similar sa native PHP, merong built-in functions, syntax and layouts for CSV
 class ExportController extends Controller
 {
     // Export all attendances for a single employee (CSV) - kung sino man viniew

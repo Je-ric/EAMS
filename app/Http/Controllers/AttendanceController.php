@@ -45,7 +45,7 @@ class AttendanceController extends Controller
             return back()->with('error', 'You already timed in today.');
         }
 
-        // Store in 24-hour format, but viwe in 12-hour format
+        // Store in 24-hour format, but view in 12-hour format
         $attendance->time_in = now()->format('H:i:s');
         $attendance->save();
 

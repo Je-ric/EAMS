@@ -239,6 +239,11 @@
         const timeOutUrl = "{{ route('attendance.timeOut') }}";
         const attendanceBase = "{{ url('/employees') }}";
 
+        // this function is used only for knowing which employee to time in/out
+        // para hindi mag mismatch, especially kung maraming employees
+        // without this, maaaring mali and kung wala talagang ganitong function, need natin magkaroon ng modal per employee
+        // in summary, yung fnction na to is inbetween ng table and modal, para mahandle yung specific employee
+        // table -> function -> modal
         function openUpdateModal(id, userId, name, position, email, picUrl, loginProvider = '') {
             document.getElementById('update_id').value = id;
             document.getElementById('update_user_id').value = userId ?? '';
@@ -261,6 +266,7 @@
             document.getElementById('updateModal').showModal();
         }
 
+        // similar sa description sa itaas
         function openAttendanceModal(email, name, picUrl, actionType) {
             const form = document.getElementById('attendanceForm');
             document.getElementById('empEmailInput').value = email || '';
@@ -272,10 +278,13 @@
         }
 
 
+        // EmployeeController::search()
         $(document).ready(function() {
-            $('#searchInput').on('keyup', function() {
-                const query = $(this).val();
+            $('#searchInput').on('keyup', function() { // for every keyup, or type
+                const query = $(this).val(); // query is search
 
+                // if query is empty, reset the table
+                // every search nagrerequest sa server, so kahit empty, need magrequest para mareset
                 $.ajax({
                     url: "{{ route('employees.search') }}",
                     method: 'GET',

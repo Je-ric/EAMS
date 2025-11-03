@@ -1,3 +1,9 @@
+{{--
+ito naman ay to render paginated employee table rows with actions
+mainly for search results and home page, every search na ginagawa ay nagrerequest sa EmployeeController
+to display specific employees by rendering this partial view. Imagine, instead mag page reload,
+nirereload/nirerender lang natin yung blade na ito mismo, para makapagdisplay ng updated employee list. --}}
+
 @forelse ($employees as $index => $employee)
     <tr class="hover:bg-blue-50 transition-colors">
         <td class="px-4 py-2">{{ ($employees->firstItem() ?? 0) + $index }}</td>
@@ -60,6 +66,16 @@
                     </div>
                 @endif
             @else
+
+                {{-- Data attributes:
+                - data-email="{{ $employee->user->email }}" ginagamit ito sa JS para mahanap yung specific employee row
+                    pagkatapos ng AJAX success, para ma-update agad yung UI ng row na iyon lang.
+                    Since partial view lang ang nire-render (hindi buong page reload), ginagamit natin ang email
+                    bilang unique identifier para maiwasan ang pagkakamali sa pag-update ng tamang row.
+                    Example:
+                        With data-email → madaling i-locate at i-update gamit ang email (unique)
+                        Without data-email → kailangan mag-loop at maghanap sa table, posibleng magkamali kung may duplicate names
+                --}}
                 <div class="flex justify-center gap-2 flex-wrap">
                     <button
                         class="flex items-center gap-1 px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50"

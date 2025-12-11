@@ -46,8 +46,14 @@ class EmployeeController extends Controller
 
         // Handle picture upload
         $picturePath = null;
+        // if ($request->hasFile('emp_pic')) {
+        //     $picturePath = $request->file('emp_pic')->store('employees', 'public');
+        // }
+
         if ($request->hasFile('emp_pic')) {
-            $picturePath = $request->file('emp_pic')->store('employees', 'public');
+            $file = $request->file('emp_pic');
+            $filename = time() . '_' . preg_replace('/\s+/', '_', strtolower($file->getClientOriginalName()));
+            $picturePath = $file->storeAs('employees', $filename, 'public');
         }
 
         // Create linked user account
@@ -88,11 +94,22 @@ class EmployeeController extends Controller
         $user = User::findOrFail($request->user_id);
 
         // Handle profile picture update
+        // if ($request->hasFile('emp_pic')) {
+        //     if ($employee->emp_pic && Storage::disk('public')->exists($employee->emp_pic)) {
+        //         Storage::disk('public')->delete($employee->emp_pic);
+        //     }
+        //     $employee->emp_pic = $request->file('emp_pic')->store('employees', 'public');
+        // }
+
         if ($request->hasFile('emp_pic')) {
+            // Delete old picture if exists
             if ($employee->emp_pic && Storage::disk('public')->exists($employee->emp_pic)) {
                 Storage::disk('public')->delete($employee->emp_pic);
             }
-            $employee->emp_pic = $request->file('emp_pic')->store('employees', 'public');
+
+            $file = $request->file('emp_pic');
+            $filename = time() . '_' . preg_replace('/\s+/', '_', strtolower($file->getClientOriginalName()));
+            $employee->emp_pic = $file->storeAs('employees', $filename, 'public');
         }
 
         // Update linked user
@@ -188,7 +205,7 @@ class EmployeeController extends Controller
         $employees = Employee::with(['user', 'attendances'])
             ->whereHas('user', function ($q) use ($query) {
                 $q->where('name', 'like', "%{$query}%")
-                ->orWhere('email', 'like', "%{$query}%");
+                    ->orWhere('email', 'like', "%{$query}%");
             })
             ->orWhere('position', 'like', "%{$query}%")
             ->paginate(5);
@@ -214,6 +231,4 @@ class EmployeeController extends Controller
             'pagination' => view('vendor.pagination.custom', ['paginator' => $employees])->render() // 2
         ]);
     }
-
-
 }
